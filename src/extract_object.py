@@ -1,36 +1,35 @@
-from select import select
 import pandas as pd
-import nltk
-import numpy as np
+import spacy
 
-def extract_noun(text):
-    morph = nltk.word_tokenize(text)
-    pos = nltk.pos_tag(morph)
-
-    select_speeches = ['NN', 'NNS', 'NNPS']
-    noun_list = []
-
-    for word in pos:
-        if word[1] in select_speeches: noun_list.append(word[0])
-    return noun_list
+def extract_noun(sentence, nlp):
+    PRP_LIST = ['i', 'my', 'me', 'mine', 'you', 'your', 'yours', 'she', 'her', 'hers', 'he', 'his', 'him', 'they', 'their', 'them', 'theirs', 'we', 'our', 'us', 'ours', 'this', 'that', 'it']
+    doc = nlp(sentence)
+    result = []
+    for noun_chunk in doc.noun_chunks:
+        result.append(noun_chunk.text)
+    for k, noun in enumerate(result):
+        if noun.lower() in PRP_LIST: result.pop(k)
+    return result
 
 if __name__ == '__main__':
-    nltk.download('punkt')
-    nltk.download('averaged_perceptron_tagger')
-    nltk.download('brown')
+    nlp = spacy.load('en_core_web_sm')
 
-    filename = 'artemis_dataset.csv'
+    filename = 'artemis_mini_translated.csv'
     df = pd.read_csv(filename)
 
     object_list = []
     cnt = 0
     for index, row in df.iterrows():
-        obj = extract_noun(row['utterance'])
-        if len(obj) == 0:
+        noun_chunks = extract_noun(row['utterance'], nlp)
+        print(row['utterance'])
+        print(row['ja_utterance'])
+        print(noun_chunks)
+        print('=====================================')
+        if len(noun_chunks) == 0:
+            object_list.append(row['utterance'])
             cnt += 1
-            # print(row['utterance'])
-            # print(obj)
-            # print('=====================================')
+    print('**************************************')
+    print(object_list)
     print(cnt)
     #     object_list.append(obj)
     
