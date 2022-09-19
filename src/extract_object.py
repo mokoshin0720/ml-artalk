@@ -1,25 +1,38 @@
 import pandas as pd
 import spacy
+from pprint import pprint
 
 def extract_noun_chunks(sentence, nlp):
     doc = nlp(sentence)
+    token_dic = {}
     result = []
 
+    for i, token in enumerate(doc):
+        if str(token.text).lower() == "like" and token.pos_ != "ADP": return []
+        token_dic[i] = [token.i, token.text, token.pos_, token.dep_, token.head.i]
+
+    pprint(token_dic)
+
     for noun_chunk in doc.noun_chunks:
-        if is_valid(str(noun_chunk)):
+        if is_valid(noun_chunk):
+            print(noun_chunk.root, noun_chunk.root.head.i, noun_chunk.root.head.text, noun_chunk.root.head.pos_)
             result.append(noun_chunk.text)
         else:
             continue
     
     return result
 
-def is_valid(noun, token_dep_lemmma_dic):
+def is_valid(noun_chunk):
     PRP_LIST = ['i', 'my', 'me', 'mine', 'you', 'your', 'yours', 'she', 'her', 'hers', 'he', 'his', 'him', 'they', 'their', 'them', 'theirs', 'we', 'our', 'us', 'ours', 'this', 'that', 'it']
     QUESTION_LIST = ['which', 'what', 'why', 'how', 'where', 'when', 'who', 'whatever', 'whenever', 'wherever', 'whoever']
     OTHER_LIST = ['all', 'some', 'any', 'something', 'anything', 'everything']
+    SPECIAL_LIST = ['evokes']
+    invalid_list = PRP_LIST + QUESTION_LIST + OTHER_LIST + SPECIAL_LIST
 
-    invalid_list = PRP_LIST + QUESTION_LIST + OTHER_LIST
-    if noun.lower() in invalid_list:
+    if str(noun_chunk).lower() in invalid_list:
+        return False
+
+    if str(noun_chunk.root.head.text).lower() == "like" and noun_chunk.root.head.pos_ == "ADP":
         return False
 
     return True
