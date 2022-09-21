@@ -10,12 +10,12 @@ def extract_noun_chunks(sentence, nlp):
     for i, token in enumerate(doc):
         token_dic[i] = [token.i, token.text, token.pos_, token.dep_, token.head.i]
 
-    pprint(token_dic)
+    # pprint(token_dic)
 
     sconj_like_range = get_sconj_like_range(doc)
 
     for noun_chunk in doc.noun_chunks:
-        if is_valid(noun_chunk, sconj_like_range):
+        if is_valid(noun_chunk, sconj_like_range, token_dic):
             print(noun_chunk.root, noun_chunk.root.head.i, noun_chunk.root.head.text, noun_chunk.root.head.pos_)
             result.append(noun_chunk.text)
         else:
@@ -39,7 +39,21 @@ def get_sconj_like_range(doc):
 
     return sconj_like_range
 
-def is_valid(noun_chunk, sconj_like_range):
+def is_remind(noun_chunk, token_dic):
+    root_noun = token_dic[noun_chunk.root.i]
+    dep_of_root_noun =  token_dic[root_noun[4]]
+
+    if dep_of_root_noun[1] != "of":
+        return False
+
+    verb_of_root_noun = token_dic[dep_of_root_noun[4]]
+    if verb_of_root_noun[1] in ['remind', 'reminds']:
+        print("&&remindです&&")
+        return True
+
+    return False
+
+def is_valid(noun_chunk, sconj_like_range, token_dic):
     PRP_LIST = ['i', 'my', 'me', 'mine', 'you', 'your', 'yours', 'she', 'her', 'hers', 'he', 'his', 'him', 'they', 'their', 'them', 'theirs', 'we', 'our', 'us', 'ours', 'this', 'that', 'it']
     QUESTION_LIST = ['which', 'what', 'why', 'how', 'where', 'when', 'who', 'whatever', 'whenever', 'wherever', 'whoever']
     OTHER_LIST = ['all', 'some', 'any', 'something', 'anything', 'everything']
@@ -52,8 +66,10 @@ def is_valid(noun_chunk, sconj_like_range):
     if str(noun_chunk.root.head.text).lower() == "like" and noun_chunk.root.head.pos_ == "ADP":
         return False
 
-    if sconj_like_range == []: return True
-    if sconj_like_range[0] < noun_chunk.root.i < sconj_like_range[1]:
+    if sconj_like_range != [] and sconj_like_range[0] < noun_chunk.root.i < sconj_like_range[1]:
+        return False
+
+    if is_remind(noun_chunk, token_dic): 
         return False
 
     return True
