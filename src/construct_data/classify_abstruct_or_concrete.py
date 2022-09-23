@@ -4,8 +4,8 @@ import numpy as np
 
 def train(nlp):
     train_set = [
-        ['apple', 'owl', 'house', 'seat', 'chair', 'juice'],
-        ['agony', 'kowledge', 'process', 'comfort', 'thirst'],
+        ['apple', 'owl', 'house', 'seat', 'chair', 'juice', 'everyon', 'beach', 'weather', 'body', 'background', 'color', 'painting', 'lava', 'orange', 'scene', 'morning', 'this', 'I', 'everything', 'path', 'people', 'company', 'monk', 'finger', 'horse', 'it', 'flower', 'emblishment', 'eye', 'she', 'middle', 'sun', 'peach', 'table', 'they', 'clock', 'hill', 'light', 'that', 'this', 'bird', 'pile', 'skull'],
+        ['agony', 'kowledge', 'process', 'comfort', 'thirst', 'warmth', 'sense', 'fear', 'height', 'summertime', 'day', 'up', 'quality', 'motion', 'time', 'life'],
     ]
 
     x = np.stack([list(nlp(w))[0].vector for part in train_set for w in part])

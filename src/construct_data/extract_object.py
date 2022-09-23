@@ -6,6 +6,8 @@ from classify_abstruct_or_concrete import train
 def extract_noun_chunks(sentence, nlp, classifier):
     doc = nlp(sentence)
     token_dic = {}
+    all_chunk_nouns = []
+    all_root_nouns = []
     result = []
     root_result = []
 
@@ -15,13 +17,15 @@ def extract_noun_chunks(sentence, nlp, classifier):
     sconj_like_range = get_sconj_like_range(doc)
 
     for noun_chunk in doc.noun_chunks:
+        all_chunk_nouns.append(noun_chunk)
+        all_root_nouns.append(noun_chunk.root.lemma_)
         if is_valid(noun_chunk, sconj_like_range, token_dic, classifier):
             result.append(noun_chunk.text)
             root_result.append(noun_chunk.root.text)
         else:
             continue
     
-    return result, root_result
+    return result, root_result, all_chunk_nouns, all_root_nouns
 
 if __name__ == '__main__':
     nlp = spacy.load('en_core_web_lg')
@@ -33,9 +37,11 @@ if __name__ == '__main__':
     object_list = []
     cnt = 0
     for index, row in df.iterrows():
-        noun_chunks, root_nouns = extract_noun_chunks(row['utterance'], nlp, classifier)
+        noun_chunks, root_nouns, all_chunk_nouns, all_root_nouns = extract_noun_chunks(row['utterance'], nlp, classifier)
         print(row['utterance'])
         print(row['ja_utterance'])
+        print(all_chunk_nouns)
+        print(all_root_nouns)
         print(noun_chunks)
         print(root_nouns)
         print('=====================================')
