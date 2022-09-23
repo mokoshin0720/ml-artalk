@@ -23,7 +23,7 @@ def extract_noun_chunks(sentence, nlp):
     return result, root_result
 
 if __name__ == '__main__':
-    nlp = spacy.load('en_core_web_sm')
+    nlp = spacy.load('en_core_web_lg')
 
     filename = 'data/artemis_mini_translated.csv'
     df = pd.read_csv(filename)

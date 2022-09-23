@@ -4,8 +4,8 @@ import numpy as np
 
 def train(nlp):
     train_set = [
-        ['apple', 'owl', 'house'],
-        ['agony', 'kowledge', 'process'],
+        ['apple', 'owl', 'house', 'seat', 'chair', 'juice'],
+        ['agony', 'kowledge', 'process', 'comfort', 'thirst'],
     ]
 
     x = np.stack([list(nlp(w))[0].vector for part in train_set for w in part])
@@ -19,7 +19,7 @@ def classify(classifier, token):
     return classes[classifier.predict([token.vector])[0]]
 
 if __name__ == "__main__":
-    nlp = spacy.load("en_core_web_sm")
+    nlp = spacy.load("en_core_web_lg")
     classifier = train(nlp)
 
     for token in nlp("Have a seat in that chair with comfort and drink some juice to soothe your thirst."):
