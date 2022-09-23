@@ -1,3 +1,5 @@
 google-cloud-translate==2.0.1
 pandas
 spacy
+scikit-learn
+numpy
