@@ -1,3 +1,5 @@
+from classify_abstruct_or_concrete import classify
+
 def get_sconj_like_range(doc):
     sconj_like_range = []
     is_started = False
@@ -27,7 +29,7 @@ def is_remind(noun_chunk, token_dic):
 
     return False
 
-def is_valid(noun_chunk, sconj_like_range, token_dic):
+def is_valid(noun_chunk, sconj_like_range, token_dic, classifier):
     PRP_LIST = ['i', 'my', 'me', 'mine', 'you', 'your', 'yours', 'she', 'her', 'hers', 'he', 'his', 'him', 'they', 'their', 'them', 'theirs', 'we', 'our', 'us', 'ours', 'this', 'that', 'it']
     QUESTION_LIST = ['which', 'what', 'why', 'how', 'where', 'when', 'who', 'whatever', 'whenever', 'wherever', 'whoever']
     OTHER_LIST = ['all', 'some', 'any', 'something', 'anything', 'everything']
@@ -44,6 +46,9 @@ def is_valid(noun_chunk, sconj_like_range, token_dic):
         return False
 
     if is_remind(noun_chunk, token_dic): 
+        return False
+
+    if classify(classifier, noun_chunk.root) == "abstract":
         return False
 
     return True
