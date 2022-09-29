@@ -16,6 +16,7 @@ def train(nlp):
             concrete_list.append(word)
         elif row['class'] == 'a':
             abstract_list.append(word)
+
     train_set = [concrete_list, abstract_list]
 
     x = np.stack([list(nlp(w))[0].vector for part in train_set for w in part])

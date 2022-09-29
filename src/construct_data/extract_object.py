@@ -31,7 +31,7 @@ if __name__ == '__main__':
     nlp = spacy.load('en_core_web_lg')
     classifier = train(nlp)
 
-    filename = 'data/artemis_mini_translated.csv'
+    filename = 'data/artemis_dataset.csv'
     df = pd.read_csv(filename)
 
     object_list = []
@@ -39,7 +39,7 @@ if __name__ == '__main__':
     for index, row in df.iterrows():
         noun_chunks, root_nouns, all_chunk_nouns, all_root_nouns = extract_noun_chunks(row['utterance'], nlp, classifier)
         print(row['utterance'])
-        print(row['ja_utterance'])
+        # print(row['ja_utterance'])
         print(all_chunk_nouns)
         print(all_root_nouns)
         print(noun_chunks)
