@@ -3,3 +3,7 @@ pandas
 spacy
 scikit-learn
 numpy
+torch
+torchvision
+pillow
+matplotlib
