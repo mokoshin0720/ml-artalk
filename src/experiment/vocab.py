@@ -27,13 +27,13 @@ class Vocabulary(object):
 def make_vocab(df, threshold):
     counter = Counter()
 
-    for i, id in enumerate(df):
-        caption = str(df.ad[i, 'utterance'])
+    for i, row in df.iterrows():
+        caption = str(row['utterance'])
         tokens = nltk.tokenize.word_tokenize(caption.lower())
         counter.update(tokens)
 
-        if (i+1) % 1000 == 0:
-            print("[{}/{}] Tokenized captions.".format(i+1, len(ids)))
+        if (i+1) % 10 == 0:
+            print("[{}/{}] Tokenized captions.".format(i+1, len(df)))
 
         words = [word for word, cnt in counter.items() if cnt >= threshold]
 
@@ -55,7 +55,7 @@ if __name__ == '__main__':
     vocab = make_vocab(df, threshold=4)
 
     vocab_path = 'data/vocab.pkl'
-    with open(vocab, 'wb') as f:
+    with open(vocab_path, 'wb') as f:
         pickle.dump(vocab, f)
 
     print("Total vocabulary size: {}".format(len(vocab)))
