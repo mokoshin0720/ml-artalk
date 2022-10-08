@@ -3,7 +3,7 @@ init:
 	docker-compose up -d
 
 run:
-	docker-compose exec artalk python -B src/experiment/dataset.py
+	docker-compose exec artalk python -B src/experiment/train.py
 
 down:
 	docker-compose down
