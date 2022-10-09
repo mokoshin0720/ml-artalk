@@ -5,11 +5,11 @@ from torchvision import transforms
 import pickle
 from dataloader import get_loader
 import pandas as pd
-from model import Encoder, Decoder
 import torch.nn as nn
 from torch.nn.utils.rnn import pack_padded_sequence
 import numpy as np
 from vocab import Vocabulary
+from models.cnn_lstm import Encoder, Decoder
 
 if __name__ == "__main__":
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
