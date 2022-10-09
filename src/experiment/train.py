@@ -72,13 +72,6 @@ if __name__ == "__main__":
             captions = captions.to(device)
             targets = pack_padded_sequence(captions, lengths, batch_first=True)[0]
 
-            # print('===========================')
-            # print(i)
-            # print(images)
-            # print(input_objects)
-            # print(captions)
-            # print(targets)
-
             features = encoder.forward(images)
             outputs = decoder.forward(features, captions, lengths)
             loss = criterion(outputs, targets)

@@ -24,8 +24,9 @@ def collate_fn(data):
     input_objects = torch.zeros(len(object_lists), max(object_list_num), max_word_num).long()
 
     for i, object_list in enumerate(object_lists):
-        object_list_end = object_list_num[i]
-        input_objects[i, :end] = object_list[:object_list_end]
+        for j, word_list in enumerate(object_list):
+            word_list_end = len(word_list)
+            input_objects[i, j, :word_list_end] = word_list[:word_list_end]
 
     return images, input_objects, targets, caption_lengths
 
