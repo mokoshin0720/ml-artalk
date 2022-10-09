@@ -19,6 +19,7 @@ if __name__ == "__main__":
     vocab_path = 'data/vocab.pkl'
     image_dir = 'data/resized'
     caption_csv = 'data/artemis_mini.csv'
+    idx2object_df = 'data/idx2object.csv'
     log_step = 5
     save_step = 50
     embed_size = 256
@@ -42,11 +43,13 @@ if __name__ == "__main__":
     with open(vocab_path, 'rb') as f:
         vocab = pickle.load(f)
 
-    df = pd.read_csv(caption_csv)
+    wikiart_df = pd.read_csv(caption_csv)
+    idx2object_df = pd.read_csv(idx2object_df)
 
     data_loader = get_loader(
         image_dir,
-        df,
+        wikiart_df,
+        idx2object_df,
         vocab,
         transform,
         batch_size,
@@ -63,10 +66,18 @@ if __name__ == "__main__":
     total_step = len(data_loader)
 
     for epoch in range(num_epochs):
-        for i, (images, captions, lengths) in enumerate(data_loader):
+        for i, (images, input_objects, captions, lengths) in enumerate(data_loader):
             images = images.to(device)
+            input_objects = input_objects.to(device)
             captions = captions.to(device)
             targets = pack_padded_sequence(captions, lengths, batch_first=True)[0]
+
+            # print('===========================')
+            # print(i)
+            # print(images)
+            # print(input_objects)
+            # print(captions)
+            # print(targets)
 
             features = encoder.forward(images)
             outputs = decoder.forward(features, captions, lengths)
