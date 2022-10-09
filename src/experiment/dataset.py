@@ -23,7 +23,6 @@ class WikiartDataset(data.Dataset):
 
         filename = wikiart_df.at[index, 'painting'] + '.jpg'
         caption = wikiart_df.at[index, 'utterance']
-        object_list = list(idx2object_df[idx2object_df['sentence_id'] == index+1]['noun_chunk'])
 
         image = Image.open(os.path.join(self.root_dir, filename)).convert('RGB')
         if self.transform is not None:
@@ -37,7 +36,18 @@ class WikiartDataset(data.Dataset):
 
         target = torch.Tensor(caption)
 
-        return image, target, object_list
+        noun_chunk_list = list(idx2object_df[idx2object_df['sentence_id'] == index+1]['noun_chunk'])
+        object_token_list = []
+
+        for noun_chunk in noun_chunk_list:
+            tokens = nltk.tokenize.word_tokenize(str(noun_chunk).lower())
+            object_token_list.append(tokens)
+
+        input_object_list = []
+        for object_token in object_token_list:
+            input_object_list.append(torch.Tensor([vocab(token) for token in object_token]))
+
+        return image, target, input_object_list
 
     def __len__(self):
         return len(self.wikiart_df)
@@ -59,4 +69,7 @@ if __name__ == '__main__':
     )
 
     for i in range(len(dataset)):
-        img, caption, object_list = dataset[i]
+        img, caption, input_object = dataset[i]
+        print(caption)
+        print(input_object)
+        print('=================================')
