@@ -1,4 +1,5 @@
 import os
+from pprint import pprint
 from PIL import Image
 import torch.utils.data as data
 import nltk
@@ -8,17 +9,21 @@ import pickle
 from vocab import Vocabulary
 
 class WikiartDataset(data.Dataset):
-    def __init__(self, root_dir, df, vocab, transform=None):
+    def __init__(self, root_dir, wikiart_df, idx2object_df, vocab, transform=None):
         self.root_dir = root_dir
-        self.df = df
+        self.wikiart_df = wikiart_df
+        self.idx2object_df = idx2object_df
         self.vocab = vocab
         self.transform = transform
 
     def __getitem__(self, index):
         vocab = self.vocab
-        df = self.df
-        filename = df.at[index, 'painting'] + '.jpg'
-        caption = df.at[index, 'utterance']
+        wikiart_df = self.wikiart_df
+        idx2object_df = self.idx2object_df
+
+        filename = wikiart_df.at[index, 'painting'] + '.jpg'
+        caption = wikiart_df.at[index, 'utterance']
+        object_list = list(idx2object_df[idx2object_df['sentence_id'] == index+1]['noun_chunk'])
 
         image = Image.open(os.path.join(self.root_dir, filename)).convert('RGB')
         if self.transform is not None:
@@ -32,10 +37,10 @@ class WikiartDataset(data.Dataset):
 
         target = torch.Tensor(caption)
 
-        return image, target
+        return image, target, object_list
 
     def __len__(self):
-        return len(self.df)
+        return len(self.wikiart_df)
 
 if __name__ == '__main__':
     nltk.download('punkt')
@@ -43,14 +48,15 @@ if __name__ == '__main__':
     with open('data/vocab.pkl', 'rb') as f:
         vocab = pickle.load(f)
 
-    df = pd.read_csv('data/artemis_mini.csv')
+    wikiart_df = pd.read_csv('data/artemis_mini.csv')
+    idx2object_df = pd.read_csv('data/idx2object.csv')
 
     dataset = WikiartDataset(
         'data/resized/',
-        df,
+        wikiart_df,
+        idx2object_df,
         vocab,
     )
 
     for i in range(len(dataset)):
-        img, caption = dataset[i]
-        print(img, caption)
+        img, caption, object_list = dataset[i]
