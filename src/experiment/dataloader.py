@@ -15,18 +15,12 @@ def collate_fn(data):
         end = caption_lengths[i]
         targets[i, :end] = cap[:end]
 
-    object_list_num = [len(object_list) for object_list in object_lists]
-    max_word_num = 0
-    for object_list in object_lists:
-        for word_list in object_list:
-            if len(word_list) > max_word_num: max_word_num = len(word_list)
+    object_nums = [len(obj) for obj in object_lists]
+    input_objects = torch.zeros(len(object_lists), max(object_nums)).long()
 
-    input_objects = torch.zeros(len(object_lists), max(object_list_num), max_word_num).long()
-
-    for i, object_list in enumerate(object_lists):
-        for j, word_list in enumerate(object_list):
-            word_list_end = len(word_list)
-            input_objects[i, j, :word_list_end] = word_list[:word_list_end]
+    for i, obj in enumerate(object_lists):
+        end = object_nums[i]
+        input_objects[i, :end] = torch.tensor(obj[:end])
 
     return images, input_objects, targets, caption_lengths
 

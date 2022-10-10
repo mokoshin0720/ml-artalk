@@ -27,17 +27,11 @@ class WikiartDataset(data.Dataset):
         image = Image.open(os.path.join(self.root_dir, filename)).convert('RGB')
         if self.transform is not None:
             image = self.transform(image)
-
-        noun_chunk_list = list(idx2object_df[idx2object_df['sentence_id'] == index+1]['noun_chunk'])
-        object_token_list = []
-
-        for noun_chunk in noun_chunk_list:
-            tokens = nltk.tokenize.word_tokenize(str(noun_chunk).lower())
-            object_token_list.append(tokens)
-
+        
+        noun_list = list(idx2object_df[idx2object_df['sentence_id'] == index+1]['object'])
         object_list = []
-        for object_token in object_token_list:
-            object_list.append(torch.Tensor([vocab(token) for token in object_token]))
+        for noun in noun_list:
+            object_list.append(vocab(noun))
 
         tokens = nltk.tokenize.word_tokenize(str(caption).lower())
         caption = []
