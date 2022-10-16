@@ -2,6 +2,8 @@ from pprint import pprint
 import torch
 from dataset import WikiartDataset
 
+MAX_OBJECT_NUM = 5
+
 def collate_fn(data):
     data.sort(key=lambda x: len(x[1]), reverse=True)
     images, object_lists, captions = zip(*data)
@@ -16,9 +18,11 @@ def collate_fn(data):
         targets[i, :end] = cap[:end]
 
     object_nums = [len(obj) for obj in object_lists]
-    input_objects = torch.zeros(len(object_lists), max(object_nums)).long()
+    object_nums = [len(obj) if len(obj) <= MAX_OBJECT_NUM else MAX_OBJECT_NUM for obj in object_lists]
+    input_objects = torch.zeros(len(object_lists), MAX_OBJECT_NUM).long()
 
     for i, obj in enumerate(object_lists):
+        if i+1 >= MAX_OBJECT_NUM: break
         end = object_nums[i]
         input_objects[i, :end] = torch.tensor(obj[:end])
 

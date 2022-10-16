@@ -9,7 +9,7 @@ import torch.nn as nn
 from torch.nn.utils.rnn import pack_padded_sequence
 import numpy as np
 from vocab import Vocabulary
-from models.cnn_lstm import Encoder, Decoder
+from models.cnn_lstm_with_object import Encoder, Decoder
 
 if __name__ == "__main__":
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -26,7 +26,7 @@ if __name__ == "__main__":
     hidden_size = 512
     num_layers = 1
     num_epochs = 10
-    batch_size = 128
+    batch_size = 4
     num_workers = 0
     learning_rate = 0.001
 
@@ -56,7 +56,7 @@ if __name__ == "__main__":
         shuffle=True,
         num_workers=num_workers,
     )
-    encoder = Encoder(embed_size).to(device)
+    encoder = Encoder(len(vocab), embed_size).to(device)
     decoder = Decoder(embed_size, hidden_size, len(vocab), num_layers)
 
     criterion = nn.CrossEntropyLoss()
@@ -70,9 +70,9 @@ if __name__ == "__main__":
             images = images.to(device)
             input_objects = input_objects.to(device)
             captions = captions.to(device)
-            targets = pack_padded_sequence(captions, lengths, batch_first=True)[0]
+            targets = pack_padded_sequence(captions, lengths, batch_first=True, enforce_sorted=False)[0]
 
-            features = encoder.forward(images)
+            features = encoder.forward(images, input_objects)
             outputs = decoder.forward(features, captions, lengths)
             loss = criterion(outputs, targets)
 
