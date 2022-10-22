@@ -1,7 +1,10 @@
+import csv
+from pprint import pprint
 import pandas as pd
 import spacy
-from .validate import is_valid, get_sconj_like_range
-from .classify_abstruct_or_concrete import train
+from validate import is_valid, get_sconj_like_range
+from classify_abstruct_or_concrete import train
+from tqdm import tqdm
 
 def extract_noun_chunks(sentence, nlp, classifier):
     doc = nlp(sentence)
@@ -15,7 +18,7 @@ def extract_noun_chunks(sentence, nlp, classifier):
 
     for noun_chunk in doc.noun_chunks:
         if is_valid(noun_chunk, sconj_like_range, token_dic, classifier):
-            result.append(noun_chunk.text)
+            result.append(noun_chunk.root.lemma_)
         else:
             continue
     
@@ -28,23 +31,16 @@ if __name__ == '__main__':
     filename = 'data/artemis_dataset.csv'
     df = pd.read_csv(filename)
 
-    object_list = []
-    cnt = 0
+    idx2object_list = []
+
+    bar = tqdm(total=len(df))
     for index, row in df.iterrows():
         noun_chunks = extract_noun_chunks(row['utterance'], nlp, classifier)
-        print(row['utterance'])
-        print(noun_chunks)
-        print('=====================================')
-        if len(noun_chunks) == 0:
-            object_list.append(row['utterance'])
-            cnt += 1
-    print('**************************************')
-    print('1つも名詞が検出されていない例文')
-    print('**************************************')
-    print(object_list)
-    print(cnt)
-    #     object_list.append(obj)
-    
-    # df['noun'] = object_list
+        for noun_chunk in noun_chunks:
+            idx2object = [index+1, noun_chunk]
+            idx2object_list.append(idx2object)
+            bar.update(1)
 
-    # df.to_csv('artemis_mini_noun.csv')
+    with open('data/idx2object.csv', 'w') as file:
+        writer = csv.writer(file, lineterminator='\n')
+        writer.writerows(idx2object_list)

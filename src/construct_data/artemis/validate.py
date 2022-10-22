@@ -1,4 +1,4 @@
-from .classify_abstruct_or_concrete import classify
+from classify_abstruct_or_concrete import classify
 
 def get_sconj_like_range(doc):
     sconj_like_range = []
