@@ -62,7 +62,7 @@ class DecoderWithAttention(nn.Module):
         device = embeddings.device
 
         predictions = torch.zeros(batch_size, max(decode_lengths), vocab_size).to(device)
-        alphhas = torch.zeros(batch_size, max(decode_lengths), num_pixels).to(device)
+        alphas = torch.zeros(batch_size, max(decode_lengths), num_pixels).to(device)
 
         for t in range(max(decode_lengths)):
             batch_size_t = sum([l > t for l in decode_lengths])

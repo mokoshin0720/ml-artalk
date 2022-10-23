@@ -9,7 +9,7 @@ import torch.nn as nn
 from torch.nn.utils.rnn import pack_padded_sequence
 import numpy as np
 from vocab import Vocabulary
-from models.cnn_lstm_with_object import Encoder, Decoder
+from experiment.models.cnn_lstm.with_word_object import Encoder, Decoder
 
 if __name__ == "__main__":
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
