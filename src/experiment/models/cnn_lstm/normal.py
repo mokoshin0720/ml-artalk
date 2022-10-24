@@ -55,3 +55,15 @@ class Decoder(nn.Module):
         predicted_ids = torch.stack(predicted_ids, 1)
 
         return predicted_ids
+
+class CNNLSTM(nn.Module):
+    def __init__(self, embed_size, hidden_size, vocab_size, num_layers, max_seq_length=20):
+        super(CNNLSTM, self).__init__()
+        self.encoder = Encoder(embed_size)
+        self.decoder = Decoder(embed_size, hidden_size, vocab_size, num_layers, max_seq_length)
+
+    def forward(self, images, captions, lengths):
+        features = self.encoder.forward(images)
+        outputs = self.decoder.forward(features, captions, lengths)
+
+        return outputs

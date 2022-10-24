@@ -67,7 +67,9 @@ if __name__ == "__main__":
             captions = captions.to(device)
             targets = pack_padded_sequence(captions, lengths, batch_first=True)[0]
 
+            print(images.size())
             features = encoder(images)
+            print(features, captions, lengths)
             outputs = decoder(features, captions, lengths)
             loss = criterion(outputs, targets)
             decoder.zero_grad()
