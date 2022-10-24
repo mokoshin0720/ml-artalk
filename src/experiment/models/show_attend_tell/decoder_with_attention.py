@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from attention import Attention
+from experiment.models.show_attend_tell.attention import Attention
 
 class DecoderWithAttention(nn.Module):
     def __init__(self, attention_dim, embed_dim, decoder_dim, vocab_size, encoder_dim=2048, dropout=0.5):
@@ -50,6 +50,8 @@ class DecoderWithAttention(nn.Module):
 
         encoder_out = encoder_out.view(batch_size, -1, encoder_dim)
         num_pixels = encoder_out.size(1)
+
+        print(caption_lengths)
 
         caption_lengths, sort_idx = caption_lengths.squeeze(1).sort(dim=0, descending=True)
         encoder_out = encoder_out[sort_idx]

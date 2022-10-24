@@ -28,6 +28,6 @@ class Encoder(nn.Module):
         for p in self.resnet.parameters():
             p.requires_grad = False
             
-        for c in list(self.resnet.children()[5:]):
+        for c in list(self.resnet.children())[5:]:
             for p in c.parameters():
                 p.requires_grad = fine_tune

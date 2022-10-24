@@ -1,7 +1,5 @@
-from pprint import pprint
 import torch
 from experiment.dataset.normal import WikiartDataset
-
 
 def collate_fn(data):
     data.sort(key=lambda x: len(x[1]), reverse=True)
@@ -16,7 +14,7 @@ def collate_fn(data):
         end = caption_lengths[i]
         targets[i, :end] = cap[:end]
 
-    return images, targets, caption_lengths
+    return images, targets, torch.FloatTensor(caption_lengths)
 
 def get_loader(root_dir, wikiart_df, vocab, transform, batch_size, shuffle, num_workers):
     wikiart = WikiartDataset(
