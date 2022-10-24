@@ -18,7 +18,7 @@ if __name__ == "__main__":
     crop_size = 224
     vocab_path = 'data/vocab.pkl'
     image_dir ='data/resized'
-    caption_csv = 'data/artemis_mini.csv'
+    caption_csv = 'data/artemis.csv'
     wikiart_df = pd.read_csv(caption_csv)
     log_step=10
     save_step=1000

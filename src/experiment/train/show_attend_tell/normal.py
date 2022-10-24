@@ -3,7 +3,7 @@ import os
 import torch
 from torchvision import transforms
 import pickle
-from experiment.dataloader.dataloader import get_loader
+from experiment.dataloader.normal import get_loader
 import pandas as pd
 import torch.nn as nn
 from torch.nn.utils.rnn import pack_padded_sequence
@@ -19,8 +19,8 @@ def train():
     crop_size = 224
     vocab_path = 'data/vocab.pkl'
     image_dir = 'data/resized'
-    caption_csv = 'data/artemis_mini.csv'
-    idx2object_df = 'data/idx2object.csv'
+    caption_csv = 'data/artemis.csv'
+    wikiart_df = pd.read_csv(caption_csv)
     log_step=10
     save_step=1000
     embed_size=14
@@ -43,13 +43,9 @@ def train():
     with open(vocab_path, 'rb') as f:
         vocab = pickle.load(f)
 
-    wikiart_df = pd.read_csv(caption_csv)
-    idx2object_df = pd.read_csv(idx2object_df)
-
     data_loader = get_loader(
         image_dir,
         wikiart_df,
-        idx2object_df,
         vocab,
         transform,
         batch_size,

@@ -1,3 +1,4 @@
+from turtle import forward
 import torch
 import torch.nn as nn
 import torchvision.models as models
@@ -15,6 +16,13 @@ class Encoder(nn.Module):
         self.adaptive_pool = nn.AdaptiveAvgPool2d((embed_size, embed_size))
 
         self.fine_tune()
+
+    def forward(self, images):
+        out = self.resnet(images)
+        out = self.adaptive_pool(out)
+        out = out.permute(0, 2, 3, 1)
+
+        return out
     
     def fine_tune(self, fine_tune=True):
         for p in self.resnet.parameters():

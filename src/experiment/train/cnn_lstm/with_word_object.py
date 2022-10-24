@@ -18,7 +18,7 @@ if __name__ == "__main__":
     crop_size = 224
     vocab_path = 'data/vocab.pkl'
     image_dir = 'data/resized'
-    caption_csv = 'data/artemis_mini.csv'
+    caption_csv = 'data/artemis.csv'
     wikiart_df = pd.read_csv(caption_csv)
     idx2object_df = 'data/idx2object.csv'
     idx2object_df = pd.read_csv(idx2object_df)
