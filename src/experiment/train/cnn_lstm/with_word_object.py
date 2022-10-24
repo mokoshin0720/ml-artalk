@@ -3,12 +3,12 @@ import os
 import torch
 from torchvision import transforms
 import pickle
-from dataloader import get_loader
+from experiment.dataloader.with_object import get_loader
 import pandas as pd
 import torch.nn as nn
 from torch.nn.utils.rnn import pack_padded_sequence
 import numpy as np
-from vocab import Vocabulary
+from experiment.utils.vocab import Vocabulary
 from experiment.models.cnn_lstm.with_word_object import Encoder, Decoder
 
 if __name__ == "__main__":
@@ -19,7 +19,9 @@ if __name__ == "__main__":
     vocab_path = 'data/vocab.pkl'
     image_dir = 'data/resized'
     caption_csv = 'data/artemis_mini.csv'
+    wikiart_df = pd.read_csv(caption_csv)
     idx2object_df = 'data/idx2object.csv'
+    idx2object_df = pd.read_csv(idx2object_df)
     log_step = 5
     save_step = 50
     embed_size = 256
@@ -42,9 +44,6 @@ if __name__ == "__main__":
 
     with open(vocab_path, 'rb') as f:
         vocab = pickle.load(f)
-
-    wikiart_df = pd.read_csv(caption_csv)
-    idx2object_df = pd.read_csv(idx2object_df)
 
     data_loader = get_loader(
         image_dir,

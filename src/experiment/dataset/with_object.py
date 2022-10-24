@@ -6,9 +6,9 @@ import nltk
 import torch
 import pandas as pd
 import pickle
-from vocab import Vocabulary
+from experiment.utils.vocab import Vocabulary
 
-class WikiartDataset(data.Dataset):
+class WikiartDatasetWithObject(data.Dataset):
     def __init__(self, root_dir, wikiart_df, idx2object_df, vocab, transform=None):
         self.root_dir = root_dir
         self.wikiart_df = wikiart_df
@@ -55,7 +55,7 @@ if __name__ == '__main__':
     wikiart_df = pd.read_csv('data/artemis_mini.csv')
     idx2object_df = pd.read_csv('data/idx2object.csv')
 
-    dataset = WikiartDataset(
+    dataset = WikiartDatasetWithObject(
         'data/resized/',
         wikiart_df,
         idx2object_df,
@@ -64,6 +64,6 @@ if __name__ == '__main__':
 
     for i in range(len(dataset)):
         img, input_object, caption = dataset[i]
-        print('================================')
-        print('================================')
+        pprint(img)
         pprint(input_object)
+        pprint(caption)

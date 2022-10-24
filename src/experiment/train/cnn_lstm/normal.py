@@ -3,14 +3,13 @@ import os
 import torch
 from torchvision import transforms
 import pickle
-from dataloader import get_loader
+from experiment.dataloader.normal import get_loader
 import pandas as pd
 import torch.nn as nn
 from torch.nn.utils.rnn import pack_padded_sequence
 import numpy as np
-from vocab import Vocabulary
+from experiment.utils.vocab import Vocabulary
 from experiment.models.cnn_lstm.normal import Encoder, Decoder
-
 
 if __name__ == "__main__":
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -20,15 +19,15 @@ if __name__ == "__main__":
     vocab_path = 'data/vocab.pkl'
     image_dir ='data/resized'
     caption_csv = 'data/artemis_mini.csv'
-    idx2object_df = 'data/idx2object.csv'
+    wikiart_df = pd.read_csv(caption_csv)
     log_step=10
     save_step=1000
     embed_size=256
     hidden_size=512
     num_layers=1
     num_epochs=10
-    batch_size=128
-    num_workers=2
+    batch_size=4
+    num_workers=0
     learning_rate=0.001
 
     if not os.path.exists(model_path):
@@ -43,13 +42,9 @@ if __name__ == "__main__":
     with open(vocab_path, 'rb') as f:
         vocab = pickle.load(f)
 
-    wikiart_df = pd.read_csv(caption_csv)
-    idx2object_df = pd.read_csv(idx2object_df)
-
     data_loader = get_loader(
         image_dir,
         wikiart_df,
-        idx2object_df,
         vocab,
         transform,
         batch_size,

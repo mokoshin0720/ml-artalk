@@ -1,11 +1,12 @@
 version: '3'
 services:
   artalk:
-    env_file: .env
+    environment:
+      PYTHONPATH: src/
     build:
       context: .
       dockerfile: Dockerfile
     container_name: 'artalk'
     tty: true
     volumes:
-      - .:/build/
+      - .:/artalk/

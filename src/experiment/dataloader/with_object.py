@@ -1,6 +1,6 @@
 from pprint import pprint
 import torch
-from dataset import WikiartDataset
+from experiment.dataset.with_object import WikiartDatasetWithObject
 
 MAX_OBJECT_NUM = 5
 
@@ -29,7 +29,7 @@ def collate_fn(data):
     return images, input_objects, targets, caption_lengths
 
 def get_loader(root_dir, wikiart_df, idx2object_df, vocab, transform, batch_size, shuffle, num_workers):
-    wikiart = WikiartDataset(
+    wikiart = WikiartDatasetWithObject(
         root_dir=root_dir,
         wikiart_df=wikiart_df,
         idx2object_df=idx2object_df,
