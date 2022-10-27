@@ -1,8 +1,8 @@
-FROM python:3
+FROM python:3.9
 
-RUN mkdir /build
-COPY . /build/
-WORKDIR /build/
+RUN mkdir /artalk
+COPY . /artalk/
+WORKDIR /artalk/
 
 RUN apt-get update
 RUN apt-get -y install locales && \
