@@ -2,6 +2,7 @@ from torch import unsqueeze
 import torch.nn as nn
 
 class Attention(nn.Module):
+
     def __init__(self, encoder_dim, decoder_dim, attention_dim):
         super(Attention, self).__init__()
         self.encoder_att = nn.Linear(encoder_dim, attention_dim)
@@ -15,6 +16,6 @@ class Attention(nn.Module):
         att2 = self.decoder_att(decoder_hidden)
         att = self.full_att(self.relu(att1 + att2.unsqueeze(1))).squeeze(2)
         alpha = self.softmax(att)
-        attention_weighted_encoding = (encoder_out * alpha*unsqueeze(2)).sum(dim=1)
+        attention_weighted_encoding = (encoder_out * alpha.unsqueeze(2)).sum(dim=1)
 
         return attention_weighted_encoding, alpha
