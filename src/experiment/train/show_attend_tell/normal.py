@@ -1,4 +1,3 @@
-from base64 import decode
 import torch
 import torch.nn as nn
 import pandas as pd
@@ -17,7 +16,6 @@ def main():
     caption_csv = 'data/artemis_dataset.csv'
     crop_size = 224
     wikiart_df = pd.read_csv(caption_csv)
-    
 
     embed_dim = 512
     attention_dim = 512
