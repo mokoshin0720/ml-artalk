@@ -16,20 +16,11 @@ def collate_fn(data):
 
     return images, targets, torch.FloatTensor(caption_lengths)
 
-def get_loader(root_dir, wikiart_df, vocab, transform, batch_size, shuffle, num_workers):
-    wikiart = WikiartDataset(
-        root_dir=root_dir,
-        wikiart_df=wikiart_df,
-        vocab=vocab,
-        transform=transform
-    )
-
-    data_loader = torch.utils.data.DataLoader(
-        dataset=wikiart,
+def get_loader(dataset, batch_size, shuffle, num_workers):
+    return torch.utils.data.DataLoader(
+        dataset=dataset,
         batch_size=batch_size,
         shuffle=shuffle,
         num_workers=num_workers,
         collate_fn=collate_fn,
     )
-
-    return data_loader

@@ -5,29 +5,15 @@ from experiment.dataloader.normal import get_loader
 import torch.nn as nn
 from experiment.utils.vocab import Vocabulary
 from experiment.train.config import get_conf, get_model
+from experiment.dataset.normal import get_dataset
 from experiment.train.normal_loop import loop_normal
 
-def train(model_name):
+def train(model_name, dataset):
     conf = get_conf(model_name)
+    data_loader = get_loader(dataset, conf['batch_size'], conf['shuffle'], conf['num_workers'])
     
     if not os.path.exists(conf['model_path']):
         os.makedirs(conf['model_path'])
-
-    transform = transforms.Compose([ 
-        transforms.RandomCrop(conf['crop_size']),
-        transforms.RandomHorizontalFlip(), 
-        transforms.ToTensor(), 
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])])
-
-    data_loader = get_loader(
-        conf['image_dir'],
-        conf['wikiart_df'],
-        conf['vocab'],
-        transform,
-        conf['batch_size'],
-        shuffle=True,
-        num_workers=conf['num_workers'],
-    )
 
     encoder, decoder = get_model(model_name, conf)
     criterion = nn.CrossEntropyLoss()
@@ -55,4 +41,7 @@ def train(model_name):
         )
 
 if __name__ == '__main__':
-    train('show_attend_tell')
+    model_name = 'cnn_lstm'
+    conf = get_conf(model_name)
+    dataset = get_dataset(conf)
+    train(model_name, dataset)

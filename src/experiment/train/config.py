@@ -23,6 +23,7 @@ def get_conf(model_name):
         'vocab': vocab,
         'wikiart_df': pd.read_csv(caption_csv),
         'idx2obj_df': pd.read_csv(idx2obj_csv),
+        'shuffle': True,
 
         # step
         'log_step': 5,
