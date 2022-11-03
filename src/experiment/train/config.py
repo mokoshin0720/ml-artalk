@@ -31,7 +31,9 @@ def get_conf(model_name):
         'embed_size': 256,
         'hidden_size': 512,
 
-        # 
+        # show-attend-tell
+        'alpha_c': 1.,
+        'grad_clip': 5.,
 
         # train
         'crop_size': 224,

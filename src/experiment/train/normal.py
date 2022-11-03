@@ -5,7 +5,7 @@ from experiment.dataloader.normal import get_loader
 import torch.nn as nn
 from experiment.utils.vocab import Vocabulary
 from experiment.train.config import get_conf, get_model
-import experiment.train.loop as loop
+from experiment.train.normal_loop import loop_normal
 
 def train(model_name):
     conf = get_conf(model_name)
@@ -42,7 +42,8 @@ def train(model_name):
     )
 
     for epoch in range(conf['num_epochs']):
-        loop.normal_cnn_lstm(
+        loop_normal(
+            model_name=model_name,
             encoder=encoder,
             decoder=decoder,
             conf=conf,
@@ -54,4 +55,4 @@ def train(model_name):
         )
 
 if __name__ == '__main__':
-    train('cnn_lstm')
+    train('show_attend_tell')
