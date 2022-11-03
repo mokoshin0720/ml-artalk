@@ -16,7 +16,7 @@ def loop_normal(
     if model_name == 'cnn_lstm':
         cnn_lstm(encoder, decoder, conf, data_loader, criterion, encoder_optimizer, decoder_optimizer, epoch)
     elif model_name == 'show_attend_tell':
-        show_attend_tell()(encoder, decoder, conf, data_loader, criterion, encoder_optimizer, decoder_optimizer, epoch)
+        show_attend_tell(encoder, decoder, conf, data_loader, criterion, encoder_optimizer, decoder_optimizer, epoch)
 
 def cnn_lstm(
     encoder: normal_cnn_lstm.Encoder, 

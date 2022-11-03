@@ -2,7 +2,8 @@ import torch
 import pandas as pd
 import numpy as np
 import os
-from experiment.models.cnn_lstm.normal import Encoder, Decoder
+import experiment.models.cnn_lstm.normal as normal_cnn_lstm
+import experiment.models.show_attend_tell.normal as normal_sat
 import pickle
 from experiment.utils.vocab import Vocabulary
 
@@ -34,6 +35,11 @@ def get_conf(model_name):
         # show-attend-tell
         'alpha_c': 1.,
         'grad_clip': 5.,
+        'attention_dim': 512,
+        'decoder_dim': 512,
+        'dropout': 0.5,
+        'encoder_dim': 2048,
+        'embed_dim': 512,
 
         # train
         'crop_size': 224,
@@ -48,8 +54,12 @@ def get_conf(model_name):
 
 def get_model(model_name, conf):
     if model_name == 'cnn_lstm':
-        encoder = Encoder(conf['embed_size']).to(conf['device'])
-        decoder = Decoder(conf['embed_size'], conf['hidden_size'], len(conf['vocab']), conf['num_layers']).to(conf['device'])
+        encoder = normal_cnn_lstm.Encoder(conf['embed_size']).to(conf['device'])
+        decoder = normal_cnn_lstm.Decoder(conf['embed_size'], conf['hidden_size'], len(conf['vocab']), conf['num_layers']).to(conf['device'])
+        return encoder, decoder
+    elif model_name == 'show_attend_tell':
+        encoder = normal_sat.Encoder(conf['embed_size'])
+        decoder = normal_sat.DecoderWithAttention(conf['attention_dim'], conf['embed_dim'], conf['decoder_dim'], len(conf['vocab']), conf['encoder_dim'], conf['dropout'])
         return encoder, decoder
 
 def loging(i: int, conf: dict, epoch: int, total_step: int, loss):
