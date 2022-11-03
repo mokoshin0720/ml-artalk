@@ -2,7 +2,18 @@ import time
 from torch.nn.utils.rnn import pack_padded_sequence
 from experiment.train.utils import AverageMeter, clip_gradient, accuracy
 
-def train(data_loader, encoder, decoder, criterion, encoder_optimizer, decoder_optimizer, epoch, alpha_c, grad_clip, print_freq, device):
+def train(
+    data_loader, 
+    encoder, 
+    decoder, 
+    criterion, 
+    encoder_optimizer, 
+    decoder_optimizer, 
+    epoch, 
+    alpha_c, 
+    grad_clip, 
+    print_freq, 
+    device):
     encoder.train()
     decoder.train()
 
