@@ -1,17 +1,15 @@
 filename ?=
+env ?=
 
 init:
-	docker-compose build
-	docker-compose up -d
+	docker-compose -f docker-compose.${env}.yml build
+	docker-compose -f docker-compose.${env}.yml up -d
 
 run:
-	docker-compose exec artalk python -B src/experiment/train.py
-
-run-cmd:
-	docker-compose exec artalk python -B ${filename}
+	docker-compose -f docker-compose.${env}.yml exec artalk python -B ${filename}
 
 down:
-	docker-compose down
+	docker-compose -f docker-compose.${env}.yml down
 
 install:
-	docker-compose exec artalk pip install -r requirements.txt
+	docker-compose -f docker-compose.${env}.yml exec artalk pip install -r requirements.txt

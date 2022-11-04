@@ -1,4 +1,5 @@
 import os
+from torchvision import transforms
 from pprint import pprint
 from PIL import Image
 import torch.utils.data as data
@@ -38,6 +39,20 @@ class WikiartDataset(data.Dataset):
 
     def __len__(self):
         return len(self.wikiart_df)
+
+def get_dataset(conf: dict):
+    transform = transforms.Compose([ 
+        transforms.RandomCrop(conf['crop_size']),
+        transforms.RandomHorizontalFlip(), 
+        transforms.ToTensor(), 
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])])
+
+    return WikiartDataset(
+            root_dir=conf['image_dir'],
+            wikiart_df=conf['wikiart_df'],
+            vocab=conf['vocab'],
+            transform=transform
+        )
 
 if __name__ == '__main__':
     nltk.download('punkt')
