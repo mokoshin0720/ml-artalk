@@ -1,6 +1,5 @@
 import os
 import torch
-from torchvision import transforms
 from experiment.dataloader.normal import get_loader
 import torch.nn as nn
 from experiment.utils.vocab import Vocabulary
