@@ -22,12 +22,14 @@ def batch_eval_scores(
 
     total_normal_score = 0
     total_average_score = 0
+
     for i in range(len(batch_hypothesis)):
         hypothesis = batch_hypothesis[i]
         references = batch_references[i]
         normal_score, average_score = scorer.compute_score(hypothesis, references)
         total_normal_score += normal_score
         total_average_score += average_score
+
     return total_normal_score / len(batch_hypothesis), total_average_score / len(batch_hypothesis)
 
 def choose_metric(metric):
