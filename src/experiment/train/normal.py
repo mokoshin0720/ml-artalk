@@ -42,5 +42,5 @@ def train(model_name, dataset):
 if __name__ == '__main__':
     model_name = 'cnn_lstm'
     conf = get_conf(model_name)
-    dataset = get_dataset(conf)
+    dataset = get_dataset(conf, is_train=True)
     train(model_name, dataset)

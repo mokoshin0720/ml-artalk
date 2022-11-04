@@ -9,7 +9,9 @@ from experiment.utils.vocab import Vocabulary
 
 def get_conf(model_name):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    caption_csv = 'data/artemis_mini.csv'
+    train_csv = 'data/artemis_train_dataset.csv'
+    test_csv = 'data/artemis_test_dataset.csv'
+    
     idx2obj_csv = 'data/idx2object.csv'
 
     with open('data/vocab.pkl', 'rb') as f:
@@ -21,13 +23,14 @@ def get_conf(model_name):
         'model_path': 'models/' + model_name + '/',
         'image_dir': 'data/resized',
         'vocab': vocab,
-        'wikiart_df': pd.read_csv(caption_csv),
+        'train_df': pd.read_csv(train_csv),
+        'test_df': pd.read_csv(test_csv),
         'idx2obj_df': pd.read_csv(idx2obj_csv),
         'shuffle': True,
 
         # step
-        'log_step': 5,
-        'save_step': 50,
+        'log_step': 10,
+        'save_step': 100,
 
         # cnn-lstm
         'embed_size': 256,
@@ -46,7 +49,7 @@ def get_conf(model_name):
         'crop_size': 224,
         'num_layers': 1,
         'num_epochs': 10,
-        'batch_size': 4,
+        'batch_size': 256,
         'num_workers': 0,
         'fine_tune_encoder': False,
         'encoder_lr': 1e-4,

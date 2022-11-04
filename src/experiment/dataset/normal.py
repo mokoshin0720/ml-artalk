@@ -40,16 +40,18 @@ class WikiartDataset(data.Dataset):
     def __len__(self):
         return len(self.wikiart_df)
 
-def get_dataset(conf: dict):
+def get_dataset(conf: dict, is_train: bool):
     transform = transforms.Compose([ 
         transforms.RandomCrop(conf['crop_size']),
         transforms.RandomHorizontalFlip(), 
         transforms.ToTensor(), 
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])])
 
+    wikiart_df = conf['train_df'] if is_train else conf['test_df']
+
     return WikiartDataset(
             root_dir=conf['image_dir'],
-            wikiart_df=conf['wikiart_df'],
+            wikiart_df=wikiart_df,
             vocab=conf['vocab'],
             transform=transform
         )
