@@ -3,6 +3,8 @@ services:
   artalk:
     environment:
       PYTHONPATH: src/
+    env_file:
+      - .env
     build:
       context: .
       dockerfile: Dockerfile
