@@ -9,7 +9,8 @@ from experiment.utils.vocab import Vocabulary
 
 def get_conf(model_name):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    train_csv = 'data/artemis_train_dataset.csv'
+    train_csv = 'data/artemis_mini.csv'
+    # train_csv = 'data/artemis_train_dataset.csv'
     test_csv = 'data/artemis_test_dataset.csv'
     
     idx2obj_csv = 'data/idx2object.csv'
