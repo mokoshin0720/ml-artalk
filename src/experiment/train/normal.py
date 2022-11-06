@@ -28,8 +28,6 @@ def train(model_name, dataset):
     )
 
     for epoch in range(conf['num_epochs']):
-        if epoch == 1:
-            raise ValueError("error happend!")
         loop_normal(
             model_name=model_name,
             encoder=encoder,
@@ -52,5 +50,5 @@ if __name__ == '__main__':
     except Exception as e:
         notify_fail(str(e))
     else:
-        notify_success()
+        notify_success(log_filename)
 
