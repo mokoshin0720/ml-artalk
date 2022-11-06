@@ -6,6 +6,7 @@ import experiment.models.cnn_lstm.normal as normal_cnn_lstm
 import experiment.models.show_attend_tell.normal as normal_sat
 import pickle
 from experiment.utils.vocab import Vocabulary
+import logging
 
 def get_conf(model_name):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -68,7 +69,7 @@ def get_model(model_name, conf):
 
 def loging(i: int, conf: dict, epoch: int, total_step: int, loss):
     if i % conf['log_step'] == 0:
-        print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}, Perplexity: {:5.4f}'
+        logging('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}, Perplexity: {:5.4f}'
                 .format(epoch, conf['num_epochs'], i, total_step, loss.item(), np.exp(loss.item()))) 
 
 def saving(i: int, conf: dict, epoch, encoder, decoder):
