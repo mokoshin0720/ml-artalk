@@ -17,7 +17,7 @@ def get_conf(model_name):
 
     with open('data/vocab.pkl', 'rb') as f:
         vocab = pickle.load(f)
-
+        
     return {
         # dataset
         'device': device,
@@ -50,7 +50,7 @@ def get_conf(model_name):
         'crop_size': 224,
         'num_layers': 1,
         'num_epochs': 10,
-        'batch_size': 256,
+        'batch_size': 512,
         'num_workers': 0,
         'fine_tune_encoder': False,
         'encoder_lr': 1e-4,
@@ -69,7 +69,7 @@ def get_model(model_name, conf):
 
 def loging(i: int, conf: dict, epoch: int, total_step: int, loss):
     if i % conf['log_step'] == 0:
-        logging('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}, Perplexity: {:5.4f}'
+        logging.info('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}, Perplexity: {:5.4f}'
                 .format(epoch, conf['num_epochs'], i, total_step, loss.item(), np.exp(loss.item()))) 
 
 def saving(i: int, conf: dict, epoch, encoder, decoder):
