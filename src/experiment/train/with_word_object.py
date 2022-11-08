@@ -1,11 +1,12 @@
 import os
 import torch
-from experiment.dataloader.normal import get_loader
+from experiment.dataloader.with_object import get_loader
 import torch.nn as nn
 from experiment.utils.vocab import Vocabulary
 from experiment.train.config import get_conf, get_model
-from experiment.dataset.normal import get_dataset
-from experiment.train.normal_loop import loop_normal
+from experiment.dataset.with_object import get_dataset
+from experiment.train.word_object_loop import train_loop
+
 from notify.logger import notify_success, notify_fail, init_logger
 
 def train(model_name, dataset):
@@ -28,7 +29,7 @@ def train(model_name, dataset):
     )
 
     for epoch in range(1, conf['num_epochs']):
-        loop_normal(
+        train_loop(
             model_name=model_name,
             encoder=encoder,
             decoder=decoder,
@@ -43,7 +44,7 @@ def train(model_name, dataset):
 if __name__ == '__main__':
     log_filename = init_logger()
     try:
-        model_name = 'cnn_lstm'
+        model_name = 'cnn_lstm_with_word_object'
         conf = get_conf(model_name)
         dataset = get_dataset(conf, is_train=True)
         train(model_name, dataset)
