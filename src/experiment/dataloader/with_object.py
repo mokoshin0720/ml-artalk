@@ -28,17 +28,9 @@ def collate_fn(data):
 
     return images, input_objects, targets, caption_lengths
 
-def get_loader(root_dir, wikiart_df, idx2object_df, vocab, transform, batch_size, shuffle, num_workers):
-    wikiart = WikiartDatasetWithObject(
-        root_dir=root_dir,
-        wikiart_df=wikiart_df,
-        idx2object_df=idx2object_df,
-        vocab=vocab,
-        transform=transform
-    )
-
+def get_loader(dataset, batch_size, shuffle, num_workers):
     data_loader = torch.utils.data.DataLoader(
-        dataset=wikiart,
+        dataset=dataset,
         batch_size=batch_size,
         shuffle=shuffle,
         num_workers=num_workers,

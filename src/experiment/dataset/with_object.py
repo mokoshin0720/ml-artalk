@@ -1,5 +1,5 @@
 import os
-from pprint import pprint
+from torchvision import transforms
 from PIL import Image
 import torch.utils.data as data
 import nltk
@@ -42,6 +42,26 @@ class WikiartDatasetWithObject(data.Dataset):
         target = torch.Tensor(caption)
 
         return image, object_list, target
+
+    def __len__(self):
+        return len(self.wikiart_df)
+
+def get_dataset(conf: dict, is_train: bool):
+    transform = transforms.Compose([ 
+        transforms.RandomCrop(conf['crop_size']),
+        transforms.RandomHorizontalFlip(), 
+        transforms.ToTensor(), 
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])])
+
+    wikiart_df = conf['train_df'] if is_train else conf['test_df']
+
+    return WikiartDatasetWithObject(
+            root_dir=conf['image_dir'],
+            wikiart_df=wikiart_df,
+            idx2object_df=conf['idx2obj_df'],
+            vocab=conf['vocab'],
+            transform=transform
+        )
 
     def __len__(self):
         return len(self.wikiart_df)
