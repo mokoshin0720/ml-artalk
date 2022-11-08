@@ -63,9 +63,6 @@ def get_dataset(conf: dict, is_train: bool):
             transform=transform
         )
 
-    def __len__(self):
-        return len(self.wikiart_df)
-
 if __name__ == '__main__':
     nltk.download('punkt')
 

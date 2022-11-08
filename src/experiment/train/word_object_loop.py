@@ -1,11 +1,11 @@
 from torch.nn.utils.rnn import pack_padded_sequence
-import experiment.models.cnn_lstm.normal as normal_cnn_lstm
+import experiment.models.cnn_lstm.with_word_object as word_object_cnn_lstm
 from experiment.train.config import loging, saving
 
 def train_loop(
     model_name: str,
-    encoder: normal_cnn_lstm.Encoder, 
-    decoder: normal_cnn_lstm.Decoder, 
+    encoder,
+    decoder,
     conf: dict,
     data_loader,
     criterion,
@@ -19,8 +19,8 @@ def train_loop(
         show_attend_tell(encoder, decoder, conf, data_loader, criterion, encoder_optimizer, decoder_optimizer, epoch)
 
 def cnn_lstm(
-    encoder: normal_cnn_lstm.Encoder, 
-    decoder: normal_cnn_lstm.Decoder, 
+    encoder: word_object_cnn_lstm.Encoder, 
+    decoder: word_object_cnn_lstm.Decoder, 
     conf: dict,
     data_loader,
     criterion,
@@ -37,7 +37,7 @@ def cnn_lstm(
         images = images.to(conf['device'])
         input_objects = input_objects.to(conf['device'])
         captions = captions.to(conf['device'])
-        targets = pack_padded_sequence(captions, lengths, batch_first=True)[0]
+        targets = pack_padded_sequence(captions, lengths, batch_first=True, enforce_sorted=False)[0]
 
         features = encoder(images, input_objects)
         outputs = decoder(features, captions, lengths)
@@ -54,8 +54,8 @@ def cnn_lstm(
         saving(i, conf, epoch, encoder, decoder)
 
 def show_attend_tell(
-    encoder: normal_cnn_lstm.Encoder, 
-    decoder: normal_cnn_lstm.Decoder, 
+    encoder: word_object_cnn_lstm.Encoder, 
+    decoder: word_object_cnn_lstm.Decoder, 
     conf: dict,
     data_loader,
     criterion,

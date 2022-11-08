@@ -4,8 +4,8 @@ from experiment.train.config import loging, saving
 
 def loop_normal(
     model_name: str,
-    encoder: normal_cnn_lstm.Encoder, 
-    decoder: normal_cnn_lstm.Decoder, 
+    encoder,
+    decoder,
     conf: dict,
     data_loader,
     criterion,
