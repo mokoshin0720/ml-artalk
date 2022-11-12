@@ -1,4 +1,5 @@
 import torch
+import torch.nn as nn
 import pandas as pd
 import numpy as np
 import os
@@ -52,7 +53,7 @@ def get_conf(model_name):
         'crop_size': 224,
         'num_layers': 1,
         'num_epochs': 10,
-        'batch_size': 512,
+        'batch_size': 256,
         'num_workers': 0,
         'fine_tune_encoder': False,
         'encoder_lr': 1e-4,
@@ -67,8 +68,12 @@ def get_model(model_name, conf):
         encoder = object_cnn_lstm.Encoder(len(conf['vocab']), conf['embed_size']).to(conf['device'])
         decoder = object_cnn_lstm.Decoder(conf['embed_size'], conf['hidden_size'], len(conf['vocab']), conf['num_layers']).to(conf['device'])
     elif model_name == 'show_attend_tell':
-        encoder = normal_sat.Encoder(conf['embed_size'])
-        decoder = normal_sat.DecoderWithAttention(conf['attention_dim'], conf['embed_dim'], conf['decoder_dim'], len(conf['vocab']), conf['encoder_dim'], conf['dropout'])
+        encoder = normal_sat.Encoder(conf['embed_size']).to(conf['device'])
+        decoder = normal_sat.DecoderWithAttention(conf['attention_dim'], conf['embed_dim'], conf['decoder_dim'], len(conf['vocab']), conf['encoder_dim'], conf['dropout']).to(conf['device'])
+        
+    if torch.cuda.device_count() > 1:
+        encoder = nn.DataParallel(encoder)
+        decoder = nn.DataParallel(decoder)
 
     return encoder, decoder
 

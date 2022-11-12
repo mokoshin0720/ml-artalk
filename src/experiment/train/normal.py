@@ -43,7 +43,7 @@ def train(model_name, dataset):
 if __name__ == '__main__':
     log_filename = init_logger()
     try:
-        model_name = 'cnn_lstm'
+        model_name = 'show_attend_tell'
         conf = get_conf(model_name)
         dataset = get_dataset(conf, is_train=True)
         train(model_name, dataset)

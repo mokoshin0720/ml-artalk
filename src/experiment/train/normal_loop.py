@@ -1,5 +1,7 @@
 from torch.nn.utils.rnn import pack_padded_sequence
 import experiment.models.cnn_lstm.normal as normal_cnn_lstm
+import experiment.models.show_attend_tell.resnet_encoder as sat_encoder
+import experiment.models.show_attend_tell.decoder_with_attention as sat_decoder
 from experiment.train.config import loging, saving
 
 def loop_normal(
@@ -53,8 +55,8 @@ def cnn_lstm(
         saving(i, conf, epoch, encoder, decoder)
 
 def show_attend_tell(
-    encoder: normal_cnn_lstm.Encoder, 
-    decoder: normal_cnn_lstm.Decoder, 
+    encoder: sat_encoder.Encoder, 
+    decoder: sat_decoder.DecoderWithAttention, 
     conf: dict,
     data_loader,
     criterion,
