@@ -5,6 +5,7 @@ import experiment.models.cnn_lstm.with_word_object as cnn_lstm_with_object
 import experiment.models.show_attend_tell.normal as normal_sat
 from experiment.models.describe.utils import get_vocab_size, get_normal_input_data, get_data_with_object
 from experiment.utils.vocab import Vocabulary
+from experiment.train.config import get_conf
 
 def describe_normal_cnn_lstm():
     embed_size = 256
@@ -19,7 +20,9 @@ def describe_normal_cnn_lstm():
         num_layers=num_layers,
     )
 
-    images, captions, lengths = get_normal_input_data()
+    conf = get_conf('cnn_lstm')
+
+    images, captions, lengths = get_normal_input_data(conf)
 
     summary(
         model,
@@ -67,7 +70,9 @@ def describe_normal_sat():
         dropout=dropout
     )
 
-    images, captions, lengths = get_normal_input_data()
+    conf = get_conf('show_attend_tell')
+
+    images, captions, lengths = get_normal_input_data(conf)
 
     summary(
         model,
@@ -75,6 +80,6 @@ def describe_normal_sat():
     )
 
 if __name__ == '__main__':
-    # describe_normal_cnn_lstm()
-    describe_cnn_lstm_with_object()
+    describe_normal_cnn_lstm()
+    # describe_cnn_lstm_with_object()
     # describe_normal_sat()

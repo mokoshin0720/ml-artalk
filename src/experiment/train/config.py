@@ -12,8 +12,8 @@ import logging
 
 def get_conf(model_name):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    train_csv = 'data/artemis_train_dataset.csv'
-    # train_csv = 'data/artemis_mini.csv'
+    # train_csv = 'data/artemis_train_dataset.csv'
+    train_csv = 'data/artemis_mini.csv'
     test_csv = 'data/artemis_test_dataset.csv'
     
     idx2obj_csv = 'data/idx2object.csv'
@@ -53,7 +53,7 @@ def get_conf(model_name):
         'crop_size': 224,
         'num_layers': 1,
         'num_epochs': 10,
-        'batch_size': 256,
+        'batch_size': 4,
         'num_workers': 0,
         'fine_tune_encoder': False,
         'encoder_lr': 1e-4,
@@ -71,10 +71,6 @@ def get_model(model_name, conf):
         encoder = normal_sat.Encoder(conf['embed_size']).to(conf['device'])
         decoder = normal_sat.DecoderWithAttention(conf['attention_dim'], conf['embed_dim'], conf['decoder_dim'], len(conf['vocab']), conf['encoder_dim'], conf['dropout']).to(conf['device'])
         
-    if torch.cuda.device_count() > 1:
-        encoder = nn.DataParallel(encoder)
-        decoder = nn.DataParallel(decoder)
-
     return encoder, decoder
 
 def loging(i: int, conf: dict, epoch: int, total_step: int, loss):
