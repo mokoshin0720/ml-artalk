@@ -42,7 +42,7 @@ def cnn_lstm(
 
         features = encoder(images)
         outputs = decoder(features, captions, lengths)
-
+        
         loss = criterion(outputs, targets)
 
         decoder.zero_grad()
@@ -78,12 +78,12 @@ def show_attend_tell(
         scores, captions_sorted, decode_lengths, alphas, sort_idx = decoder(features, captions, caplens)
 
         targets = captions_sorted[:, 1:]
-
+        
         scores = pack_padded_sequence(scores, decode_lengths, batch_first=True).data
         targets = pack_padded_sequence(targets, decode_lengths, batch_first=True).data
-
+        
         loss = criterion(scores, targets)
-
+        
         loss += conf['alpha_c'] * ((1. - alphas.sum(dim=1)) ** 2).mean()
 
         if encoder_optimizer is not None: encoder_optimizer.zero_grad()

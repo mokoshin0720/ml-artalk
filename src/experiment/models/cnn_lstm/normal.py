@@ -7,7 +7,7 @@ class Encoder(nn.Module):
     def __init__(self, embed_size):
         super(Encoder, self).__init__()
 
-        resnet = models.resnet152(pretrained=True)
+        resnet = models.resnet34(pretrained=True)
         modules = list(resnet.children())[:-1]
 
         self.resnet = nn.Sequential(*modules)

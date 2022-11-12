@@ -26,7 +26,7 @@ def main():
 
     start_epoch = 0
     epochs = 120
-    epochs_since_improvement = 0
+    epochs_since_improvement = 20
     batch_size = 32
     encoder_lr = 1e-4
     decoder_lr = 4e-4

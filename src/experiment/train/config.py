@@ -38,7 +38,7 @@ def get_conf(model_name):
         'save_step': 100,
 
         # cnn-lstm
-        'embed_size': 256,
+        'embed_size': 512,
         'hidden_size': 512,
 
         # show-attend-tell
@@ -47,19 +47,19 @@ def get_conf(model_name):
         'attention_dim': 512,
         'decoder_dim': 512,
         'dropout': 0.5,
-        'encoder_dim': 2048,
+        'encoder_dim': 512,
         'embed_dim': 512,
         'clip_gradient': clip_gradient,
 
         # train
         'crop_size': 224,
         'num_layers': 1,
-        'num_epochs': 10,
-        'batch_size': 4,
+        'num_epochs': 100,
+        'batch_size': 1,
         'num_workers': 0,
         'fine_tune_encoder': False,
         'encoder_lr': 1e-4,
-        'decoder_lr': 1e-4,
+        'decoder_lr': 4e-4,
     }
 
 def get_model(model_name, conf):

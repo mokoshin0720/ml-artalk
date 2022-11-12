@@ -55,7 +55,7 @@ def describe_normal_sat():
     encoder_embed_size = 14
     decoder_embed_size = 512
     attention_dim = 512
-    encoder_dim = 2048
+    encoder_dim = 512
     decoder_dim = 512
     vocab_size = get_vocab_size()
     dropout=0.5
@@ -80,6 +80,6 @@ def describe_normal_sat():
     )
 
 if __name__ == '__main__':
-    describe_normal_cnn_lstm()
+    # describe_normal_cnn_lstm()
     # describe_cnn_lstm_with_object()
-    # describe_normal_sat()
+    describe_normal_sat()
