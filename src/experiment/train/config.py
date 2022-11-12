@@ -6,6 +6,7 @@ import os
 import experiment.models.cnn_lstm.normal as normal_cnn_lstm
 import experiment.models.cnn_lstm.with_word_object as object_cnn_lstm
 import experiment.models.show_attend_tell.normal as normal_sat
+from experiment.train.utils import clip_gradient
 import pickle
 from experiment.utils.vocab import Vocabulary
 import logging
@@ -48,6 +49,7 @@ def get_conf(model_name):
         'dropout': 0.5,
         'encoder_dim': 2048,
         'embed_dim': 512,
+        'clip_gradient': clip_gradient,
 
         # train
         'crop_size': 224,

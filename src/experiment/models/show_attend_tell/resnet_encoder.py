@@ -18,13 +18,14 @@ class Encoder(nn.Module):
         self.fine_tune()
 
     def forward(self, images):
-        out = self.resnet(images)
+        with torch.no_grad():
+            out = self.resnet(images)
         out = self.adaptive_pool(out)
         out = out.permute(0, 2, 3, 1)
 
         return out
     
-    def fine_tune(self, fine_tune=True):
+    def fine_tune(self, fine_tune=False):
         for p in self.resnet.parameters():
             p.requires_grad = False
             
