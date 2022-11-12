@@ -4,7 +4,7 @@ import experiment.models.show_attend_tell.resnet_encoder as sat_encoder
 import experiment.models.show_attend_tell.decoder_with_attention as sat_decoder
 from experiment.train.config import loging, saving
 
-def loop_normal(
+def train_loop(
     model_name: str,
     encoder,
     decoder,

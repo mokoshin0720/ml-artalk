@@ -5,7 +5,7 @@ import torch.nn as nn
 from experiment.utils.vocab import Vocabulary
 from experiment.train.config import get_conf, get_model
 from experiment.dataset.normal import get_dataset
-from experiment.train.normal_loop import loop_normal
+from experiment.train.normal_loop import train_loop
 from notify.logger import notify_success, notify_fail, init_logger
 
 def train(model_name, dataset):
@@ -28,7 +28,7 @@ def train(model_name, dataset):
     )
 
     for epoch in range(1, conf['num_epochs']):
-        loop_normal(
+        train_loop(
             model_name=model_name,
             encoder=encoder,
             decoder=decoder,
