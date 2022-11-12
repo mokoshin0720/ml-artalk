@@ -1,4 +1,3 @@
-from torch import unsqueeze
 import torch.nn as nn
 
 class Attention(nn.Module):
