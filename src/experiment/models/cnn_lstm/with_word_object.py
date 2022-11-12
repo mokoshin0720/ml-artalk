@@ -20,11 +20,11 @@ class Encoder(nn.Module):
     def forward(self, images, input_objects):
         with torch.no_grad():
             features = self.resnet(images)
-
+        
         features = features.reshape(features.size(0), -1)
         features = self.bn(self.linear(features))
-
-        object_features = self.embed(input_objects).view(4, -1)
+        
+        object_features = self.embed(input_objects).view(features.size(0), -1)
         features = torch.cat([features, object_features], 1)
 
         return features
