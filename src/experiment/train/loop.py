@@ -1,5 +1,6 @@
 from torch.nn.utils.rnn import pack_padded_sequence
 import experiment.models.cnn_lstm.normal as normal_cnn_lstm
+import experiment.models.cnn_lstm.with_word_object as word_object_cnn_lstm
 import experiment.models.show_attend_tell.resnet_encoder as sat_encoder
 import experiment.models.show_attend_tell.decoder_with_attention as sat_decoder
 from experiment.train.config import loging, saving
@@ -17,6 +18,8 @@ def train_loop(
 ):
     if model_name == 'cnn_lstm':
         cnn_lstm(encoder, decoder, conf, data_loader, criterion, encoder_optimizer, decoder_optimizer, epoch)
+    if model_name == 'cnn_lstm_with_object':
+        cnn_lstm_with_object(encoder, decoder, conf, data_loader, criterion, encoder_optimizer, decoder_optimizer, epoch)
     elif model_name == 'show_attend_tell':
         show_attend_tell(encoder, decoder, conf, data_loader, criterion, encoder_optimizer, decoder_optimizer, epoch)
 
@@ -42,6 +45,41 @@ def cnn_lstm(
 
         features = encoder(images)
         outputs = decoder(features, captions, lengths)
+        
+        loss = criterion(outputs, targets)
+
+        decoder.zero_grad()
+        encoder.zero_grad()
+        loss.backward()
+        if encoder_optimizer is not None: encoder_optimizer.step()
+        decoder_optimizer.step()
+
+        loging(i, conf, epoch, total_step, loss)
+        saving(i, conf, epoch, encoder, decoder)
+        
+def cnn_lstm_with_object(
+    encoder: word_object_cnn_lstm.Encoder, 
+    decoder: word_object_cnn_lstm.Decoder, 
+    conf: dict,
+    data_loader,
+    criterion,
+    encoder_optimizer,
+    decoder_optimizer,
+    epoch,
+    ):
+    encoder.train()
+    decoder.train()
+
+    total_step = len(data_loader)
+
+    for i, (images, captions, lengths) in enumerate(data_loader):
+        images = images.to(conf['device'])
+        input_objects = input_objects.to(conf['device'])
+        captions = captions.to(conf['device'])
+        targets = pack_padded_sequence(captions, lengths, batch_first=True)[0]
+
+        features = encoder.forward(images, input_objects)
+        outputs = decoder.forward(features, captions, lengths)
         
         loss = criterion(outputs, targets)
 

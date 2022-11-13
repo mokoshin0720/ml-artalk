@@ -5,7 +5,7 @@ import torch.nn as nn
 from experiment.utils.vocab import Vocabulary
 from experiment.train.config import get_conf, get_model
 from experiment.dataset.normal import get_dataset
-from experiment.train.normal_loop import train_loop
+from experiment.train.loop import train_loop
 from notify.logger import notify_success, notify_fail, init_logger
 
 def train(model_name, dataset):
@@ -43,8 +43,9 @@ def train(model_name, dataset):
 if __name__ == '__main__':
     log_filename = init_logger()
     try:
-        model_name = 'show_attend_tell'
         # model_name = 'cnn_lstm'
+        model_name = 'cnn_lstm_with_object'
+        # model_name = 'show_attend_tell'
         conf = get_conf(model_name)
         dataset = get_dataset(conf, is_train=True)
         train(model_name, dataset)

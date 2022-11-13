@@ -12,7 +12,10 @@ from experiment.utils.vocab import Vocabulary
 import logging
 
 def get_conf(model_name):
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    # device = 'cuda:0'
+    device = 'cuda:1'
+    # device = 'cuda:2'
+    # device = 'cuda:3'
     train_csv = 'data/artemis_train_dataset.csv'
     # train_csv = 'data/artemis_mini.csv'
     test_csv = 'data/artemis_test_dataset.csv'
@@ -66,12 +69,14 @@ def get_model(model_name, conf):
     if model_name == 'cnn_lstm':
         encoder = normal_cnn_lstm.Encoder(conf['embed_size']).to(conf['device'])
         decoder = normal_cnn_lstm.Decoder(conf['embed_size'], conf['hidden_size'], len(conf['vocab']), conf['num_layers']).to(conf['device'])
-    elif model_name == 'cnn_lstm_with_word_object':
+    elif model_name == 'cnn_lstm_with_object':
         encoder = object_cnn_lstm.Encoder(len(conf['vocab']), conf['embed_size']).to(conf['device'])
         decoder = object_cnn_lstm.Decoder(conf['embed_size'], conf['hidden_size'], len(conf['vocab']), conf['num_layers']).to(conf['device'])
     elif model_name == 'show_attend_tell':
         encoder = normal_sat.Encoder().to(conf['device'])
         decoder = normal_sat.DecoderWithAttention(conf['attention_dim'], conf['embed_dim'], conf['decoder_dim'], len(conf['vocab']), conf['encoder_dim'], conf['dropout']).to(conf['device'])
+    else:
+        assert 'Invalid model name from get_model'
         
     return encoder, decoder
 

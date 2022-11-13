@@ -13,21 +13,19 @@ def evaluate(dataset, model_name, encoder_path, decoder_path):
         accs = []
 
         encoder, decoder = get_model(model_name, conf)
+        
         encoder.load_state_dict(torch.load(encoder_path))
         decoder.load_state_dict(torch.load(decoder_path))
-
-        data_loader = torch.utils.data.DataLoader(
-            dataset=dataset,
-            batch_size=conf['batch_size'],
-            shuffle=conf['shuffle'],
-        )
-
+        
+        encoder.eval()
+        decoder.eval()
+        
         for images, captions, lengths in data_loader:
             images, captions, lengths = images.to(conf['device']), captions.to(conf['device']), lengths.to(conf['device'])
-
+            
             features = encoder(images)
             predicted_ids = decoder.predict(features)
-            predicted_ids = predicted_ids[0].numpy()
+            predicted_ids = predicted_ids[0].cpu().numpy()
 
             predicted_caption = []
             for word_id in predicted_ids:
@@ -44,11 +42,14 @@ if __name__ == '__main__':
         # model_name = 'cnn_lstm'
         model_name = 'show_attend_tell'
 
-        encoder_path = 'models/cnn_lstm/encoder-4-150.ckpt'
-        decoder_path = 'models/cnn_lstm/decoder-4-150.ckpt'
+        encoder_path = 'models/show_attend_tell/encoder-10-800.ckpt'
+        decoder_path = 'models/show_attend_tell/decoder-10-800.ckpt'
 
         conf = get_conf(model_name)
-        dataset = get_dataset(conf, is_train=False)
+        
+        print(len(conf['vocab']))
+        
+        dataset = get_dataset(conf, is_train=True)
         evaluate(dataset, model_name, encoder_path, decoder_path)
     except Exception as e:
         notify_fail(str(e))

@@ -39,8 +39,8 @@ def make_vocab(df, threshold):
 
     vocab = Vocabulary()
     vocab.add_word('<pad>')
-    vocab.add_word('<start>')
-    vocab.add_word('<end>')
+    vocab.add_word('<sos>')
+    vocab.add_word('<eos>')
     vocab.add_word('<unk>')
 
     for i, word in enumerate(words):
@@ -49,7 +49,7 @@ def make_vocab(df, threshold):
     return vocab
 
 if __name__ == '__main__':
-    filename = 'data/artemis_mini.csv'
+    filename = 'data/artemis_dataset.csv'
     df = pd.read_csv(filename)
 
     vocab = make_vocab(df, threshold=4)
