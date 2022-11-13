@@ -71,12 +71,12 @@ def cnn_lstm_with_object(
     decoder.train()
 
     total_step = len(data_loader)
-
-    for i, (images, captions, lengths) in enumerate(data_loader):
+    
+    for i, (images, input_objects, captions, lengths) in enumerate(data_loader):
         images = images.to(conf['device'])
         input_objects = input_objects.to(conf['device'])
         captions = captions.to(conf['device'])
-        targets = pack_padded_sequence(captions, lengths, batch_first=True)[0]
+        targets = pack_padded_sequence(captions, lengths, batch_first=True, enforce_sorted=False)[0]
 
         features = encoder.forward(images, input_objects)
         outputs = decoder.forward(features, captions, lengths)

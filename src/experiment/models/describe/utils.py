@@ -1,18 +1,16 @@
 import pickle
 import pandas as pd
 from torchvision import transforms
-import experiment.dataloader.normal as normal_loader
+import experiment.dataloader.get as normal_loader
 import experiment.dataloader.with_object as with_object_loader
-from experiment.dataset.normal import get_dataset
+from experiment.dataset.class import get_dataset
 
 def get_normal_input_data(conf: dict):
     dataset = get_dataset(conf, is_train=True)
     
     data_loader = normal_loader.get_loader(
         dataset=dataset,
-        batch_size=conf['batch_size'],
-        shuffle=conf['shuffle'],
-        num_workers=conf['num_workers']
+        conf=conf,
     )
 
     for images, captions, lengths in data_loader:

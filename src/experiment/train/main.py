@@ -1,21 +1,21 @@
 import os
 import torch
-from experiment.dataloader.normal import get_loader
+from experiment.dataloader.get import get_loader
 import torch.nn as nn
 from experiment.utils.vocab import Vocabulary
 from experiment.train.config import get_conf, get_model
-from experiment.dataset.normal import get_dataset
+from experiment.dataset.get import get_dataset
 from experiment.train.loop import train_loop
 from notify.logger import notify_success, notify_fail, init_logger
 
-def train(model_name, dataset):
-    conf = get_conf(model_name)
-    data_loader = get_loader(dataset, conf['batch_size'], conf['shuffle'], conf['num_workers'])
+def train(conf):
+    dataset = get_dataset(conf, is_train=True)
+    data_loader = get_loader(dataset, conf)
+    encoder, decoder = get_model(conf)
     
     if not os.path.exists(conf['model_path']):
         os.makedirs(conf['model_path'])
 
-    encoder, decoder = get_model(model_name, conf)
     criterion = nn.CrossEntropyLoss()
 
     encoder_optimizer = torch.optim.Adam(
@@ -29,7 +29,7 @@ def train(model_name, dataset):
 
     for epoch in range(1, conf['num_epochs']):
         train_loop(
-            model_name=model_name,
+            model_name=conf['model_name'],
             encoder=encoder,
             decoder=decoder,
             conf=conf,
@@ -43,12 +43,8 @@ def train(model_name, dataset):
 if __name__ == '__main__':
     log_filename = init_logger()
     try:
-        # model_name = 'cnn_lstm'
-        model_name = 'cnn_lstm_with_object'
-        # model_name = 'show_attend_tell'
-        conf = get_conf(model_name)
-        dataset = get_dataset(conf, is_train=True)
-        train(model_name, dataset)
+        conf = get_conf()
+        train(conf)
     except Exception as e:
         notify_fail(str(e))
     else:

@@ -1,15 +1,13 @@
-from pprint import pprint
 import torch
-from experiment.dataset.with_object import WikiartDatasetWithObject
 
-MAX_OBJECT_NUM = 5
-
-def collate_fn(data):
+def collate_with_object(data):
+    MAX_OBJECT_NUM = 5
+    
     data.sort(key=lambda x: len(x[1]), reverse=True)
     images, object_lists, captions = zip(*data)
-
+    
     images = torch.stack(images, 0)
-
+    
     caption_lengths = [len(cap) for cap in captions]
     targets = torch.zeros(len(captions), max(caption_lengths)).long()
 
@@ -28,13 +26,17 @@ def collate_fn(data):
 
     return images, input_objects, targets, caption_lengths
 
-def get_loader(dataset, batch_size, shuffle, num_workers):
-    data_loader = torch.utils.data.DataLoader(
-        dataset=dataset,
-        batch_size=batch_size,
-        shuffle=shuffle,
-        num_workers=num_workers,
-        collate_fn=collate_fn,
-    )
+def collate_normal(data):
+    data.sort(key=lambda x: len(x[1]), reverse=True)
+    images, captions = zip(*data)
 
-    return data_loader
+    images = torch.stack(images, 0)
+
+    caption_lengths = [len(cap) for cap in captions]
+    targets = torch.zeros(len(captions), max(caption_lengths)).long()
+
+    for i, cap in enumerate(captions):
+        end = caption_lengths[i]
+        targets[i, :end] = cap[:end]
+
+    return images, targets, torch.FloatTensor(caption_lengths)

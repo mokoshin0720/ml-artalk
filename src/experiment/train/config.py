@@ -11,24 +11,45 @@ import pickle
 from experiment.utils.vocab import Vocabulary
 import logging
 
-def get_conf(model_name):
+def get_conf():
     # device = 'cuda:0'
     device = 'cuda:1'
     # device = 'cuda:2'
     # device = 'cuda:3'
+    
     train_csv = 'data/artemis_train_dataset.csv'
     # train_csv = 'data/artemis_mini.csv'
     test_csv = 'data/artemis_test_dataset.csv'
-    
     idx2obj_csv = 'data/idx2object.csv'
+    
+    cnn_lstm = 'cnn_lstm'
+    cnn_lstm_with_object = 'cnn_lstm_with_object'
+    show_attend_tell = 'show_attend_tell'
+    show_attend_tell_with_object = 'show_attend_tell_with_object'
+    
+    normal_models = [
+        cnn_lstm,
+        show_attend_tell
+    ]
+    word_object_models = [
+        cnn_lstm_with_object,
+        show_attend_tell_with_object,
+    ]
+    
+    use_model = cnn_lstm_with_object
 
     with open('data/vocab.pkl', 'rb') as f:
         vocab = pickle.load(f)
         
     return {
+        # models
+        'model_name': use_model,
+        'normal_models': normal_models,
+        'word_object_models': word_object_models,
+        
         # dataset
         'device': device,
-        'model_path': 'models/' + model_name + '/',
+        'model_path': 'models/' + use_model + '/',
         'image_dir': 'data/resized',
         'vocab': vocab,
         'train_df': pd.read_csv(train_csv),
@@ -65,14 +86,14 @@ def get_conf(model_name):
         'decoder_lr': 4e-4,
     }
 
-def get_model(model_name, conf):
-    if model_name == 'cnn_lstm':
+def get_model(conf):
+    if conf['model_name'] == 'cnn_lstm':
         encoder = normal_cnn_lstm.Encoder(conf['embed_size']).to(conf['device'])
         decoder = normal_cnn_lstm.Decoder(conf['embed_size'], conf['hidden_size'], len(conf['vocab']), conf['num_layers']).to(conf['device'])
-    elif model_name == 'cnn_lstm_with_object':
+    elif conf['model_name'] == 'cnn_lstm_with_object':
         encoder = object_cnn_lstm.Encoder(len(conf['vocab']), conf['embed_size']).to(conf['device'])
         decoder = object_cnn_lstm.Decoder(conf['embed_size'], conf['hidden_size'], len(conf['vocab']), conf['num_layers']).to(conf['device'])
-    elif model_name == 'show_attend_tell':
+    elif conf['model_name'] == 'show_attend_tell':
         encoder = normal_sat.Encoder().to(conf['device'])
         decoder = normal_sat.DecoderWithAttention(conf['attention_dim'], conf['embed_dim'], conf['decoder_dim'], len(conf['vocab']), conf['encoder_dim'], conf['dropout']).to(conf['device'])
     else:

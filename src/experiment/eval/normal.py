@@ -1,13 +1,13 @@
 import torch
 from experiment.train.config import get_conf, get_model
-from experiment.dataloader.normal import get_loader
-from experiment.dataset.normal import get_dataset
+from experiment.dataloader.get import get_loader
+from experiment.dataset.class import get_dataset
 from experiment.utils.vocab import Vocabulary
 from notify.logger import notify_success, notify_fail, init_logger
 
 def evaluate(dataset, model_name, encoder_path, decoder_path):
     conf = get_conf(model_name)
-    data_loader = get_loader(dataset, conf['batch_size'], conf['shuffle'], conf['num_workers'])
+    data_loader = get_loader(dataset, conf)
 
     with torch.no_grad():
         accs = []
