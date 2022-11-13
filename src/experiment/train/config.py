@@ -1,15 +1,7 @@
-import torch
-import torch.nn as nn
 import pandas as pd
-import numpy as np
-import os
-import experiment.models.cnn_lstm.normal as normal_cnn_lstm
-import experiment.models.cnn_lstm.with_word_object as object_cnn_lstm
-import experiment.models.show_attend_tell.normal as normal_sat
 from experiment.train.utils import clip_gradient
 import pickle
 from experiment.utils.vocab import Vocabulary
-import logging
 
 def get_conf():
     # device = 'cuda:0'
@@ -85,30 +77,3 @@ def get_conf():
         'encoder_lr': 1e-4,
         'decoder_lr': 4e-4,
     }
-
-def get_model(conf):
-    if conf['model_name'] == 'cnn_lstm':
-        encoder = normal_cnn_lstm.Encoder(conf['embed_size']).to(conf['device'])
-        decoder = normal_cnn_lstm.Decoder(conf['embed_size'], conf['hidden_size'], len(conf['vocab']), conf['num_layers']).to(conf['device'])
-    elif conf['model_name'] == 'cnn_lstm_with_object':
-        encoder = object_cnn_lstm.Encoder(len(conf['vocab']), conf['embed_size']).to(conf['device'])
-        decoder = object_cnn_lstm.Decoder(conf['embed_size'], conf['hidden_size'], len(conf['vocab']), conf['num_layers']).to(conf['device'])
-    elif conf['model_name'] == 'show_attend_tell':
-        encoder = normal_sat.Encoder().to(conf['device'])
-        decoder = normal_sat.DecoderWithAttention(conf['attention_dim'], conf['embed_dim'], conf['decoder_dim'], len(conf['vocab']), conf['encoder_dim'], conf['dropout']).to(conf['device'])
-    else:
-        assert 'Invalid model name from get_model'
-        
-    return encoder, decoder
-
-def loging(i: int, conf: dict, epoch: int, total_step: int, loss):
-    if i % conf['log_step'] == 0:
-        logging.info('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}, Perplexity: {:5.4f}'
-                .format(epoch, conf['num_epochs'], i, total_step, loss.item(), np.exp(loss.item()))) 
-
-def saving(i: int, conf: dict, epoch, encoder, decoder):
-    if (i+1) % conf['save_step'] == 0:
-            torch.save(encoder.state_dict(), os.path.join(
-                conf['model_path'], 'encoder-{}-{}.ckpt'.format(epoch+1, i+1)))
-            torch.save(decoder.state_dict(), os.path.join(
-                conf['model_path'], 'decoder-{}-{}.ckpt'.format(epoch+1, i+1)))

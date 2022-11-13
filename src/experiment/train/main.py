@@ -1,9 +1,11 @@
+import shutil
 import os
 import torch
 from experiment.dataloader.get import get_loader
 import torch.nn as nn
 from experiment.utils.vocab import Vocabulary
-from experiment.train.config import get_conf, get_model
+from experiment.train.config import get_conf
+from experiment.train.utils import get_model
 from experiment.dataset.get import get_dataset
 from experiment.train.loop import train_loop
 from notify.logger import notify_success, notify_fail, init_logger

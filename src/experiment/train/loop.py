@@ -3,7 +3,7 @@ import experiment.models.cnn_lstm.normal as normal_cnn_lstm
 import experiment.models.cnn_lstm.with_word_object as word_object_cnn_lstm
 import experiment.models.show_attend_tell.resnet_encoder as sat_encoder
 import experiment.models.show_attend_tell.decoder_with_attention as sat_decoder
-from experiment.train.config import loging, saving
+from experiment.train.utils import loging, saving
 
 def train_loop(
     model_name: str,

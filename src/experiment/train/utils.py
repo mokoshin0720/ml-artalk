@@ -1,64 +1,39 @@
 import torch
+import experiment.models.cnn_lstm.normal as normal_cnn_lstm
+import experiment.models.cnn_lstm.with_word_object as object_cnn_lstm
+import experiment.models.show_attend_tell.normal as normal_sat
+import logging
+import os
+import numpy as np
 
 def clip_gradient(optimizer, grad_clip):
     for group in optimizer.param_groups:
         for param in group["params"]:
             if param.grad is not None: param.grad.data.clamp_(-grad_clip, grad_clip)
+            
+def get_model(conf):
+    if conf['model_name'] == 'cnn_lstm':
+        encoder = normal_cnn_lstm.Encoder(conf['embed_size']).to(conf['device'])
+        decoder = normal_cnn_lstm.Decoder(conf['embed_size'], conf['hidden_size'], len(conf['vocab']), conf['num_layers']).to(conf['device'])
+    elif conf['model_name'] == 'cnn_lstm_with_object':
+        encoder = object_cnn_lstm.Encoder(len(conf['vocab']), conf['embed_size']).to(conf['device'])
+        decoder = object_cnn_lstm.Decoder(conf['embed_size'], conf['hidden_size'], len(conf['vocab']), conf['num_layers']).to(conf['device'])
+    elif conf['model_name'] == 'show_attend_tell':
+        encoder = normal_sat.Encoder().to(conf['device'])
+        decoder = normal_sat.DecoderWithAttention(conf['attention_dim'], conf['embed_dim'], conf['decoder_dim'], len(conf['vocab']), conf['encoder_dim'], conf['dropout']).to(conf['device'])
+    else:
+        assert 'Invalid model name from get_model'
+        
+    return encoder, decoder
 
-def save_checkpoint(
-    data_name,
-    epoch,
-    epochs_since_improvement,
-    encoder,
-    decoder,
-    encoder_optimizer,
-    decoder_optimizer,
-    bleu4,
-    is_best,
-):
-    state = {
-        'epoch': epoch,
-        'epochs_since_improvement': epochs_since_improvement,
-        'bleu-4': bleu4,
-        'encoder': encoder,
-        'decoder': decoder,
-        'encoder_optimizer': encoder_optimizer,
-        'decoder_optimizer': decoder_optimizer,
-    }
+def loging(i: int, conf: dict, epoch: int, total_step: int, loss):
+    if i % conf['log_step'] == 0:
+        logging.info('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}, Perplexity: {:5.4f}'
+                .format(epoch, conf['num_epochs'], i, total_step, loss.item(), np.exp(loss.item()))) 
 
-    filename = 'checkpoint_' + data_name + '.pth.tar'
-    torch.save(state, filename)
-
-    if is_best:
-        torch.save(state, 'BEST_' + filename)
-
-class AverageMeter(object):
-    def __init__(self):
-        self.reset()
-
-    def reset(self):
-        self.val = 0
-        self.avg = 0
-        self.sum = 0
-        self.count = 0
-
-    def update(self, val, n=1):
-        self.val = val
-        self.sum += val * n
-        self.count += n
-        self.avg = self.sum / self.count
-
-def adjust_learning_rate(optimizer, shrink_factor):
-    print('DECAYING learning rate')
-    for param_group in optimizer.param_groups:
-        param_group['lr'] = param_group['lr'] * shrink_factor
-
-    print("The new learning rate is %f" % (optimizer.param_groups[0]['lr']))
-
-def accuracy(scores, targets, k):
-    batch_size = targets.size(0)
-    _, idx = scores.topk(k, 1, True, True)
-    correct = idx.eq(targets.view(-1, 1).expand_as(idx))
-    correct_total = correct.view(-1).float().sum()
-
-    return correct_total.item() * (100.0 / batch_size)
+def saving(i: int, conf: dict, epoch, encoder, decoder):
+    if (i+1) % conf['save_step'] == 0:
+            torch.save(encoder.state_dict(), os.path.join(
+                conf['model_path'], 'encoder-{}-{}.ckpt'.format(epoch, i+1)))
+            torch.save(decoder.state_dict(), os.path.join(
+                conf['model_path'], 'decoder-{}-{}.ckpt'.format(epoch, i+1)))
