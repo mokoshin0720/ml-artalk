@@ -9,6 +9,7 @@ from experiment.train.utils import get_model
 from experiment.dataset.get import get_dataset
 from experiment.train.loop import train_loop
 from notify.logger import notify_success, notify_fail, init_logger
+import traceback
 
 def train(conf):
     dataset = get_dataset(conf, is_train=True)
@@ -48,6 +49,7 @@ if __name__ == '__main__':
         conf = get_conf()
         train(conf)
     except Exception as e:
+        traceback.print_exc()
         notify_fail(str(e))
     else:
         notify_success(log_filename)

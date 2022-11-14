@@ -4,12 +4,13 @@ import pickle
 from experiment.utils.vocab import Vocabulary
 
 def get_conf():
-    # device = 'cuda:0'
-    device = 'cuda:1'
+    device = 'cuda:0'
+    # device = 'cuda:1'
     # device = 'cuda:2'
     # device = 'cuda:3'
     
-    train_csv = 'data/artemis_train_dataset.csv'
+    # train_csv = 'data/artemis_train_dataset.csv'
+    train_csv = 'data/artemis_dataset.csv'
     # train_csv = 'data/artemis_mini.csv'
     test_csv = 'data/artemis_test_dataset.csv'
     idx2obj_csv = 'data/idx2object.csv'
