@@ -9,8 +9,7 @@ def get_conf():
     # device = 'cuda:2'
     # device = 'cuda:3'
     
-    # train_csv = 'data/artemis_train_dataset.csv'
-    train_csv = 'data/artemis_dataset.csv'
+    train_csv = 'data/artemis_train_dataset.csv'
     # train_csv = 'data/artemis_mini.csv'
     test_csv = 'data/artemis_test_dataset.csv'
     idx2obj_csv = 'data/idx2object.csv'
@@ -29,7 +28,7 @@ def get_conf():
         show_attend_tell_with_object,
     ]
     
-    use_model = cnn_lstm_with_object
+    use_model = cnn_lstm
 
     with open('data/vocab.pkl', 'rb') as f:
         vocab = pickle.load(f)

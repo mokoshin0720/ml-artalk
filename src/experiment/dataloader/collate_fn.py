@@ -1,10 +1,25 @@
 import torch
 
+def collate_normal(data):
+    data.sort(key=lambda x: len(x[1]), reverse=True)
+    filenames, images, captions = zip(*data)
+
+    images = torch.stack(images, 0)
+
+    caption_lengths = [len(cap) for cap in captions]
+    targets = torch.zeros(len(captions), max(caption_lengths)).long()
+
+    for i, cap in enumerate(captions):
+        end = caption_lengths[i]
+        targets[i, :end] = cap[:end]
+
+    return filenames, images, targets, torch.FloatTensor(caption_lengths)
+
 def collate_with_object(data):
     MAX_OBJECT_NUM = 5
     
     data.sort(key=lambda x: len(x[1]), reverse=True)
-    images, object_lists, captions = zip(*data)
+    filenames, images, object_lists, captions = zip(*data)
     
     images = torch.stack(images, 0)
     
@@ -24,19 +39,4 @@ def collate_with_object(data):
         end = object_nums[i]
         input_objects[i, :end] = torch.tensor(obj[:end])
 
-    return images, input_objects, targets, caption_lengths
-
-def collate_normal(data):
-    data.sort(key=lambda x: len(x[1]), reverse=True)
-    images, captions = zip(*data)
-
-    images = torch.stack(images, 0)
-
-    caption_lengths = [len(cap) for cap in captions]
-    targets = torch.zeros(len(captions), max(caption_lengths)).long()
-
-    for i, cap in enumerate(captions):
-        end = caption_lengths[i]
-        targets[i, :end] = cap[:end]
-
-    return images, targets, torch.FloatTensor(caption_lengths)
+    return filenames, images, input_objects, targets, caption_lengths
