@@ -1,11 +1,15 @@
 import pandas as pd
-from tqdm import tqdm
+
+def get_comments_of_img(
+    origin_df,
+    filename,
+):
+    return origin_df[origin_df['painting'] == filename]['utterance'].values.tolist()
 
 if __name__ == '__main__':
     filename = 'data/artemis_dataset.csv'
     df = pd.read_csv(filename)
     
-    abr = tqdm(total=len(df))
     for idx, row in df.iterrows():
-        img = row['painting']
-        comment_list = df[df['painting'] == img]['utterance']
+        filename = row['painting']
+        print(get_comments_of_img(df, filename))

@@ -9,12 +9,10 @@ from experiment.eval.loop import eval_loop
 import traceback
 
 def evaluate(conf, encoder_path, decoder_path):
-    dataset = get_dataset(conf, is_train=False)
+    dataset = get_dataset(conf, is_train=True)
     data_loader = get_loader(dataset, conf)
 
     with torch.no_grad():
-        accs = []
-
         encoder, decoder = get_model(conf)
         
         encoder.load_state_dict(torch.load(encoder_path))
@@ -32,8 +30,8 @@ if __name__ == '__main__':
     log_filename = init_logger()
     try:
         conf = get_conf()
-        encoder_path = 'models/cnn_lstm_with_object/encoder-9-800.ckpt'
-        decoder_path = 'models/cnn_lstm_with_object/decoder-9-800.ckpt'
+        encoder_path = 'models/cnn_lstm/encoder-9-800.ckpt'
+        decoder_path = 'models/cnn_lstm/decoder-9-800.ckpt'
         
         evaluate(conf, encoder_path, decoder_path)
     except Exception as e:

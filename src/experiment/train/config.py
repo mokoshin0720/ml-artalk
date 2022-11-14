@@ -71,7 +71,7 @@ def get_conf():
         'crop_size': 224,
         'num_layers': 1,
         'num_epochs': 10,
-        'batch_size': 512,
+        'batch_size': 4,
         'num_workers': 0,
         'fine_tune_encoder': False,
         'encoder_lr': 1e-4,

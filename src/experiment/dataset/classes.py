@@ -31,7 +31,7 @@ class WikiartDataset(data.Dataset):
 
         target = torch.Tensor(caption)
 
-        return image, target
+        return filename, image, target
 
     def __len__(self):
         return len(self.wikiart_df)
@@ -69,7 +69,7 @@ class WikiartDatasetWithObject(data.Dataset):
 
         target = torch.Tensor(caption)
 
-        return image, object_list, target
+        return filename, image, object_list, target
 
     def __len__(self):
         return len(self.wikiart_df)
