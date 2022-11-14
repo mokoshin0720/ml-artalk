@@ -1,5 +1,4 @@
 import csv
-from pprint import pprint
 import pandas as pd
 import spacy
 from validate import is_valid, get_sconj_like_range
