@@ -10,8 +10,16 @@ from experiment.dataset.get import get_dataset
 from experiment.train.loop import train_loop
 from notify.logger import notify_success, notify_fail, init_logger
 import traceback
+import wandb
+import datetime
 
 def train(conf):
+    wandb.init(
+        project="artalk",
+        config=conf,
+        name=conf['model_name']+str(datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9)))),
+    )
+    
     dataset = get_dataset(conf, is_train=True)
     data_loader = get_loader(dataset, conf)
     encoder, decoder = get_model(conf)

@@ -5,6 +5,7 @@ import experiment.models.show_attend_tell.normal as normal_sat
 import logging
 import os
 import numpy as np
+import wandb
 
 def clip_gradient(optimizer, grad_clip):
     for group in optimizer.param_groups:
@@ -28,6 +29,7 @@ def get_model(conf):
 
 def loging(i: int, conf: dict, epoch: int, total_step: int, loss):
     if i % conf['log_step'] == 0:
+        wandb.log({'loss': loss})
         logging.info('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}, Perplexity: {:5.4f}'
                 .format(epoch, conf['num_epochs'], i, total_step, loss.item(), np.exp(loss.item()))) 
 

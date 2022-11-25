@@ -1,5 +1,8 @@
 filename ?=
-env ?=
+env = prod
+ifeq ($(env), local)
+	env=local
+endif
 
 init:
 	docker-compose -f docker-compose.${env}.yml build

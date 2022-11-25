@@ -37,19 +37,19 @@ def cnn_lstm(
     decoder.train()
 
     total_step = len(data_loader)
-
-    for i, (images, captions, lengths) in enumerate(data_loader):
+    
+    for i, (filenames, images, captions, lengths) in enumerate(data_loader):
         images = images.to(conf['device'])
         captions = captions.to(conf['device'])
-        targets = pack_padded_sequence(captions, lengths, batch_first=True)[0]
+        targets = pack_padded_sequence(captions, lengths, batch_first=True, enforce_sorted=False)[0]
 
         features = encoder(images)
         outputs = decoder(features, captions, lengths)
         
         loss = criterion(outputs, targets)
 
-        decoder.zero_grad()
-        encoder.zero_grad()
+        decoder_optimizer.zero_grad()
+        encoder_optimizer.zero_grad()
         loss.backward()
         if encoder_optimizer is not None: encoder_optimizer.step()
         decoder_optimizer.step()
@@ -83,8 +83,8 @@ def cnn_lstm_with_object(
         
         loss = criterion(outputs, targets)
 
-        decoder.zero_grad()
-        encoder.zero_grad()
+        decoder_optimizer.zero_grad()
+        encoder_optimizer.zero_grad()
         loss.backward()
         if encoder_optimizer is not None: encoder_optimizer.step()
         decoder_optimizer.step()

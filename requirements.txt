@@ -10,3 +10,8 @@ tqdm
 torchinfo
 torchtext==0.13.0
 slackclient
+wandb
+
+torch
+torchvision
+--find-links https://download.pytorch.org/whl/cu116
