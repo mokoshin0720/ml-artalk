@@ -12,6 +12,7 @@ import pycocotools.mask as mask_util
 import torch
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 from PIL import Image
+import pprint
 
 from construct_data.detic.detectron2.data import MetadataCatalog
 from construct_data.detic.detectron2.structures import BitMasks, Boxes, BoxMode, Keypoints, PolygonMasks, RotatedBoxes
@@ -493,12 +494,26 @@ class Visualizer:
         # draw mask for all semantic segments first i.e. "stuff"
         for mask, sinfo in pred.semantic_masks():
             category_idx = sinfo["category_id"]
+            
             try:
                 mask_color = [x / 255 for x in self.metadata.stuff_colors[category_idx]]
             except AttributeError:
                 mask_color = None
 
             text = self.metadata.stuff_classes[category_idx]
+            
+            
+            if text != 'tree':
+                continue
+        
+            
+            # pprint.pprint(mask)
+            # i = Image.fromarray(np.uint8(mask))
+            # a = np.asarray(i.resize((256, 256)))
+            # pprint.pprint(a)
+            # ai = Image.fromarray(np.uint8(a))
+            # mask = np.asarray(ai.resize((1382, 1680)))
+            
             self.draw_binary_mask(
                 mask,
                 color=mask_color,
@@ -534,6 +549,28 @@ class Visualizer:
         return self.output
 
     draw_panoptic_seg_predictions = draw_panoptic_seg  # backward compatibility
+    
+    def get_panoptic_pixel(self, panoptic_seg, segments_info, target, area_threshold=None, alpha=0.7):
+        pred = _PanopticPrediction(panoptic_seg, segments_info, self.metadata)
+        
+        for mask, sinfo in pred.semantic_masks():
+            category_idx = sinfo['category_id']
+            text = self.metadata.stuff_classes[category_idx]
+            
+            if text != target: continue
+            
+            return mask
+        
+        for mask, sinfo in pred.instance_masks():
+            category_idx = sinfo['category_id']
+            
+            text = self.metadata.thing_classes[category_idx]
+            
+            if text != target: continue
+            
+            return mask
+        
+        raise ValueError('{} not found...'.format(target))
 
     def draw_dataset_dict(self, dic):
         """
