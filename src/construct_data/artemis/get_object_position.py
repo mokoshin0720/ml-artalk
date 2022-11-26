@@ -12,35 +12,29 @@ from construct_data.detic.detectron2.config import get_cfg
 from construct_data.detic.detectron2.utils.visualizer import Visualizer
 from construct_data.detic.detectron2.data import MetadataCatalog
 
-def do_segmentation():
+def get_panoptic_segmentation(filename: str):
     cfg = get_cfg()
-    # add project-specific config (e.g., TensorMask) here if you're not running a model in detectron2's core library
-    cfg.merge_from_file(model_zoo.get_config_file("COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml"))
-    cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5  # set threshold for this model
-
-    # Find a model from construct_data.detic.detectron2's model zoo. You can use the https://dl.fbaipublicfiles... url as well
-    cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml")
+    cfg.merge_from_file(model_zoo.get_config_file("COCO-PanopticSegmentation/panoptic_fpn_R_101_3x.yaml"))
+    cfg.MODEL.PANOPTIC_FPN.COMBINE.INSTANCES_CONFIDENCE_THRESH = 0.7
+    cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-PanopticSegmentation/panoptic_fpn_R_101_3x.yaml")
     predictor = DefaultPredictor(cfg)
-
-    im = cv2.imread("./data/resized/zinaida-serebriakova_woman-in-blue-1934.jpg")
-    outputs = predictor(im)
-    v = Visualizer(im[:, :, ::-1], MetadataCatalog.get(cfg.DATASETS.TRAIN[0]), scale=1.2)
-
-    # out = v.draw_instance_predictions(outputs["instances"].to("cpu"))
-    out = v.draw_instance_predictions(outputs["instances"].to("cpu"))
-    cv2.imwrite('test.png', out.get_image()[:, :, ::-1])
     
-def get_segmentation_pixel(object: str):
+    im = cv2.imread(filename)
+    
+    panoptic_seg, segments_info = predictor(im)["panoptic_seg"]
+    v = Visualizer(im[:, :, ::-1], MetadataCatalog.get(cfg.DATASETS.TRAIN[0]), scale=1.2)
+    v = v.draw_panoptic_seg_predictions(panoptic_seg.to("cpu"), segments_info)
+    cv2.imwrite('person.png', v.get_image()[:, :, ::-1])
+
+def get_segmentation_pixel(filename: str ,object: str):
     cfg = get_cfg()
-    # add project-specific config (e.g., TensorMask) here if you're not running a model in detectron2's core library
     cfg.merge_from_file(model_zoo.get_config_file("COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml"))
     cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5  # set threshold for this model
 
-    # Find a model from construct_data.detic.detectron2's model zoo. You can use the https://dl.fbaipublicfiles... url as well
     cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml")
     predictor = DefaultPredictor(cfg)
 
-    im = cv2.imread("data/resized/zinaida-serebriakova_woman-in-blue-1934.jpg")
+    im = cv2.imread(filename)
     outputs = predictor(im)
     
     target = MetadataCatalog.get(cfg.DATASETS.TRAIN[0]).thing_classes.index(object)
@@ -55,7 +49,9 @@ def get_segmentation_pixel(object: str):
     im_con = im.copy()
     output = cv2.drawContours(im_con, con, -1, (0, 255, 0), 2)
     cv2.imwrite('person.png', output)
-    
+
 if __name__ == '__main__':
-    # do_segmentation()
-    get_segmentation_pixel('person')
+    img_file = 'data/wikiart/Baroque/adriaen-brouwer_drinkers-in-the-yard.jpg'
+    object = 'vase'
+    # get_segmentation_pixel(img_file, object)
+    # get_panoptic_segmentation(img_file)

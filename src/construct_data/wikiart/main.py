@@ -4,7 +4,6 @@ import torch
 import torchvision
 from PIL import Image
 
-
 def get_torch(art_style: str, filename: str) -> torch.tensor:
     BASE_DIR = 'data/wikiart/'
     dir = BASE_DIR + art_style + '/' + filename + '.jpg'
