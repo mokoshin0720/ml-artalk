@@ -1,10 +1,10 @@
 import pandas as pd
 
-def get_comments_of_img(
+def list_utterances_of_img(
     origin_df,
-    filename,
+    painting,
 ):
-    return origin_df[origin_df['painting'] == filename]['utterance'].values.tolist()
+    return origin_df[origin_df['painting'] == painting]['utterance'].values.tolist()
 
 if __name__ == '__main__':
     filename = 'data/artemis_dataset.csv'
@@ -12,4 +12,4 @@ if __name__ == '__main__':
     
     for idx, row in df.iterrows():
         filename = row['painting']
-        print(get_comments_of_img(df, filename))
+        print(list_utterances_of_img(df, filename))

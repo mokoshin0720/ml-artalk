@@ -11,6 +11,7 @@ torchinfo
 torchtext==0.13.0
 slackclient
 wandb
+sentence-transformers
 
 # for detectron2
 docutils==0.16
