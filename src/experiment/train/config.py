@@ -50,7 +50,6 @@ def get_conf():
 
         # step
         'log_step': 10,
-        'save_step': 100,
 
         # cnn-lstm
         'embed_size': 512,
@@ -70,9 +69,9 @@ def get_conf():
         'crop_size': 224,
         'num_layers': 1,
         'num_epochs': 10,
-        'batch_size': 4,
+        'batch_size': 256,
         'num_workers': 0,
         'fine_tune_encoder': False,
         'encoder_lr': 1e-4,
-        'decoder_lr': 4e-4,
+        'decoder_lr': 1e-4,
     }

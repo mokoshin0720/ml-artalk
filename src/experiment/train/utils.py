@@ -29,13 +29,24 @@ def get_model(conf):
 
 def loging(i: int, conf: dict, epoch: int, total_step: int, loss):
     if i % conf['log_step'] == 0:
-        wandb.log({'loss': loss})
         logging.info('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}, Perplexity: {:5.4f}'
                 .format(epoch, conf['num_epochs'], i, total_step, loss.item(), np.exp(loss.item()))) 
+        
+def plotting(loss: int, is_train: bool):
+    if is_train:
+        wandb.log({'train_loss': loss})
+    else:
+        wandb.log({'val_loss': loss})
 
-def saving(i: int, conf: dict, epoch, encoder, decoder):
-    if (i+1) % conf['save_step'] == 0:
-            torch.save(encoder.state_dict(), os.path.join(
-                conf['model_path'], 'encoder-{}-{}.ckpt'.format(epoch, i+1)))
-            torch.save(decoder.state_dict(), os.path.join(
-                conf['model_path'], 'decoder-{}-{}.ckpt'.format(epoch, i+1)))
+def saving(conf: dict, epoch, encoder, decoder):
+    torch.save(
+        encoder.state_dict(), 
+        os.path.join(
+        conf['model_path'], 'encoder-{}.ckpt'.format(epoch))
+    )
+    
+    torch.save(
+        decoder.state_dict(),
+        os.path.join(
+        conf['model_path'], 'decoder-{}.ckpt'.format(epoch))
+    )

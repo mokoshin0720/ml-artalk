@@ -3,9 +3,10 @@ import experiment.models.cnn_lstm.normal as normal_cnn_lstm
 import experiment.models.cnn_lstm.with_word_object as word_object_cnn_lstm
 import experiment.models.show_attend_tell.resnet_encoder as sat_encoder
 import experiment.models.show_attend_tell.decoder_with_attention as sat_decoder
-from experiment.train.utils import loging, saving
+from experiment.train.utils import loging, saving, plotting
+import statistics
 
-def train_loop(
+def model_loop(
     model_name: str,
     encoder,
     decoder,
@@ -15,13 +16,14 @@ def train_loop(
     encoder_optimizer,
     decoder_optimizer,
     epoch,
+    is_train,
 ):
     if model_name == 'cnn_lstm':
-        cnn_lstm(encoder, decoder, conf, data_loader, criterion, encoder_optimizer, decoder_optimizer, epoch)
+        cnn_lstm(encoder, decoder, conf, data_loader, criterion, encoder_optimizer, decoder_optimizer, epoch, is_train)
     if model_name == 'cnn_lstm_with_object':
-        cnn_lstm_with_object(encoder, decoder, conf, data_loader, criterion, encoder_optimizer, decoder_optimizer, epoch)
+        cnn_lstm_with_object(encoder, decoder, conf, data_loader, criterion, encoder_optimizer, decoder_optimizer, epoch, is_train)
     elif model_name == 'show_attend_tell':
-        show_attend_tell(encoder, decoder, conf, data_loader, criterion, encoder_optimizer, decoder_optimizer, epoch)
+        show_attend_tell(encoder, decoder, conf, data_loader, criterion, encoder_optimizer, decoder_optimizer, epoch, is_train)
 
 def cnn_lstm(
     encoder: normal_cnn_lstm.Encoder, 
@@ -32,12 +34,16 @@ def cnn_lstm(
     encoder_optimizer,
     decoder_optimizer,
     epoch,
+    is_train,
     ):
-    encoder.train()
-    decoder.train()
+    if is_train:
+        encoder.train()
+        decoder.train()
+    else:
+        encoder.eval()
+        decoder.eval()
 
-    total_step = len(data_loader)
-    
+    losses = []
     for i, (filenames, images, captions, lengths) in enumerate(data_loader):
         images = images.to(conf['device'])
         captions = captions.to(conf['device'])
@@ -48,15 +54,21 @@ def cnn_lstm(
         
         loss = criterion(outputs, targets)
 
-        decoder_optimizer.zero_grad()
-        encoder_optimizer.zero_grad()
-        loss.backward()
-        if encoder_optimizer is not None: encoder_optimizer.step()
-        decoder_optimizer.step()
+        if is_train:
+            decoder_optimizer.zero_grad()
+            if encoder_optimizer is not None: encoder_optimizer.zero_grad()
 
-        loging(i, conf, epoch, total_step, loss)
-        saving(i, conf, epoch, encoder, decoder)
-        
+            loss.backward()
+
+            if encoder_optimizer is not None: encoder_optimizer.step()
+            decoder_optimizer.step()
+
+        loging(i, conf, epoch, len(data_loader), loss)
+        losses.append(loss.item())
+
+    if is_train: saving(conf, epoch, encoder, decoder)
+    plotting(statistics.mean(losses), is_train)
+
 def cnn_lstm_with_object(
     encoder: word_object_cnn_lstm.Encoder, 
     decoder: word_object_cnn_lstm.Decoder, 
