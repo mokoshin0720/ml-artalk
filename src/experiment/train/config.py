@@ -27,7 +27,7 @@ def get_conf():
         show_attend_tell_with_object,
     ]
     
-    use_model = cnn_lstm
+    use_model = show_attend_tell
 
     with open('data/vocab.pkl', 'rb') as f:
         vocab = pickle.load(f)
@@ -68,8 +68,8 @@ def get_conf():
         # train
         'crop_size': 224,
         'num_layers': 1,
-        'num_epochs': 10,
-        'batch_size': 256,
+        'num_epochs': 30,
+        'batch_size': 128,
         'num_workers': 0,
         'fine_tune_encoder': False,
         'encoder_lr': 1e-4,

@@ -11,4 +11,4 @@ RUN apt-get install -y libgl1-mesa-dev
 
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
-# RUN python3 -m spacy download en_core_web_lg
+RUN python3 -m spacy download en_core_web_lg

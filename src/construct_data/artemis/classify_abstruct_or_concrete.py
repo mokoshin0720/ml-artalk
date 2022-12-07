@@ -2,27 +2,33 @@ import spacy
 from sklearn.linear_model import LogisticRegression
 import numpy as np
 import pandas as pd
+import nltk
+nltk.download('averaged_perceptron_tagger')
 
 def train(nlp):
-    filename = 'data/abstract_concrete_noun.csv'
-    df = pd.read_csv(filename)
+    filename = 'data/brysbaer.xlsx'
+    df = pd.read_excel(filename)
 
-    concrete_list = []
-    abstract_list = []
-
-    for _, row in df.iterrows():
-        word = row['word']
-        if row['class'] == 'c':
-            concrete_list.append(word)
-        elif row['class'] == 'a':
-            abstract_list.append(word)
-
-    train_set = [concrete_list, abstract_list]
+    concrete_word_list = df[df['Conc.M'] >= 3]['Word'].tolist()
+    abstract_word_list = df[df['Conc.M'] < 3]['Word'].tolist()
+    
+    concrete_word_list = extract_noun(concrete_word_list)
+    abstract_word_list = extract_noun(abstract_word_list)
+    
+    train_set = [concrete_word_list, abstract_word_list]
 
     x = np.stack([list(nlp(w))[0].vector for part in train_set for w in part])
     y = [label for label, part in enumerate(train_set) for _ in part]
     classifier = LogisticRegression(C=0.1, class_weight='balanced').fit(x, y)
     return classifier
+
+def extract_noun(word_list):
+    result = []
+    
+    for word_pos in nltk.pos_tag(word_list[:10]):
+        if word_pos[1] in ['NN', 'NNS', 'NNP', 'NNPS', 'PP', 'PRP$']: result.append(word_pos[0])
+    
+    return result
 
 def classify(classifier, token):
     classes = ['concrete', 'abstract']

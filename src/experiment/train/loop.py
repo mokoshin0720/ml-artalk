@@ -131,7 +131,7 @@ def show_attend_tell(
         decoder.eval()
 
     losses = []
-    for i, (imgs, captions, caplens) in enumerate(data_loader):
+    for i, (filenames, imgs, captions, caplens) in enumerate(data_loader):
         imgs = imgs.to(conf['device'])
         captions = captions.to(conf['device'])
         caplens = caplens.to(conf['device'])
