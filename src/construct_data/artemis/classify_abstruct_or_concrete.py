@@ -1,32 +1,95 @@
 import spacy
 from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.model_selection import train_test_split
 import numpy as np
 import pandas as pd
 import nltk
+import pickle
+import os
+import matplotlib.pyplot as plt
+from sklearn.metrics import confusion_matrix
+import seaborn as sns
 nltk.download('averaged_perceptron_tagger')
 
-def train(nlp):
+def prepare_dataset(test_size):
     filename = 'data/brysbaer.xlsx'
     df = pd.read_excel(filename)
 
-    concrete_word_list = df[df['Conc.M'] >= 3]['Word'].tolist()
-    abstract_word_list = df[df['Conc.M'] < 3]['Word'].tolist()
-    
-    concrete_word_list = extract_noun(concrete_word_list)
-    abstract_word_list = extract_noun(abstract_word_list)
+    concrete_word_list = extract_noun(df[df['Conc.M'] >= 3]['Word'].tolist()[:100])
+    abstract_word_list = extract_noun(df[df['Conc.M'] < 3]['Word'].tolist()[:100])
     
     train_set = [concrete_word_list, abstract_word_list]
 
     x = np.stack([list(nlp(w))[0].vector for part in train_set for w in part])
     y = [label for label, part in enumerate(train_set) for _ in part]
-    classifier = LogisticRegression(C=0.1, class_weight='balanced').fit(x, y)
-    return classifier
+    
+    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=test_size)
+    
+    return x_train, x_test, y_train, y_test
 
+def train(x_train, x_test, y_train, y_test):
+    names = [
+        "Logistic Regression", 
+        "Nearest Neighbors", 
+        "Linear SVM",
+        "RBF SVM",
+        "Polynomial SVM",
+        "Sigmoid SVM", 
+        "Decision Tree",
+        "Random Forest",
+        "Naive Bayes",
+    ]
+    
+    classifiers = [
+        LogisticRegression(),
+        KNeighborsClassifier(),
+        SVC(kernel="linear"),
+        SVC(kernel="rbf"),
+        SVC(kernel="poly"),
+        SVC(kernel="sigmoid"),
+        DecisionTreeClassifier(),
+        RandomForestClassifier(),
+        GaussianNB(),
+    ]
+    
+    result = []
+    
+    for name, clf in zip(names, classifiers):
+        print('train {} ...', name)
+        clf.fit(x_train, y_train)
+        train_score = clf.score(x_train, y_train)
+        test_score = clf.score(x_test, y_test)
+        
+        if not os.path.exists('models/abstract_classifier'):
+            os.makedirs('models/abstract_classifier')
+        filename = 'models/abstract_classifier/{}.sav'.format(name)
+        pickle.dump(clf, open(filename, 'wb'))
+        
+        result.append([train_score, test_score])
+        
+    df_result = pd.DataFrame(result, columns=['train', 'test'], index=names).sort_values('test', ascending=False)
+    
+    plt.rcParams['figure.subplot.bottom'] = 0.2
+    plt.figure()
+    df_result.plot(kind='bar', alpha=0.5, grid=True, figsize=(10, 10))
+    plt.savefig('classifiers.png')
+    plt.close('all')
+    
+    best_classifier = pickle.load(open('models/abstract_classifier/{}.sav'.format(df_result.head(1).index[0])))
+    
+    return best_classifier
+    
 def extract_noun(word_list):
     result = []
     
-    for word_pos in nltk.pos_tag(word_list[:10]):
-        if word_pos[1] in ['NN', 'NNS', 'NNP', 'NNPS', 'PP', 'PRP$']: result.append(word_pos[0])
+    for word in word_list:
+        word_pos = nltk.pos_tag([str(word)])
+        if word_pos[0][1] in ['NN', 'NNS', 'NNP', 'NNPS', 'PP', 'PRP$']: result.append(word_pos[0][0])
     
     return result
 
@@ -35,11 +98,23 @@ def classify(classifier, token):
 
     return classes[classifier.predict([token.vector])[0]]
 
+def plot_confision_matrix(classifier, x_test, y_test):
+    pred = classifier.predict(x_test)
+    cm = confusion_matrix(y_test, pred)
+    
+    sns.heatmap(cm, square=True, cbar=True, annot=True, cmap='Blues')
+    plt.savefig('confusion_matrix.png')
+
 if __name__ == "__main__":
     nlp = spacy.load("en_core_web_lg")
-    classifier = train(nlp)
+    
+    x_train, x_test, y_train, y_test = prepare_dataset(test_size=0.2)    
+    
+    print('Dataset prepared...')
+    classifier =  train(x_train, x_test, y_train, y_test)
+    plot_confision_matrix(classifier, x_test, y_test)
 
-    for token in nlp("Have a seat in that chair with comfort and drink some juice to soothe your thirst."):
-        if token.pos_ == 'NOUN':
-            result = classify(classifier, token)
-            print(token, result)
+    # for token in nlp("Have a seat in that chair with comfort and drink some juice to soothe your thirst."):
+    #     if token.pos_ == 'NOUN':
+    #         result = classify(classifier, token)
+    #         print(token, result)

@@ -14,6 +14,7 @@ wandb
 sentence-transformers
 openpyxl
 xlrd
+seaborn
 
 # for detectron2
 docutils==0.16
