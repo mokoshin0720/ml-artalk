@@ -80,11 +80,13 @@ def get_parser():
         nargs="+",
         help="A list of space separated input images; "
         "or a single glob pattern such as 'directory/*.jpg'",
+        default=['data/detic/desk.jpg'],
     )
     parser.add_argument(
         "--output",
         help="A file or directory to save output visualizations. "
         "If not given, will show output in an OpenCV window.",
+        default='out.jpg'
     )
     parser.add_argument(
         "--vocabulary",
@@ -141,6 +143,9 @@ if __name__ == "__main__":
 
     demo = VisualizationDemo(cfg, args)
 
+    print('----------------------------------')
+    print('start demo...')
+    print('----------------------------------')
     if args.input:
         if len(args.input) == 1:
             args.input = glob.glob(os.path.expanduser(args.input[0]))
