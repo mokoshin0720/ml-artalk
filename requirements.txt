@@ -37,6 +37,8 @@ timm
 fairscale
 opencv-python
 pycocotools
+mss
+
 
 # torch
 torch
