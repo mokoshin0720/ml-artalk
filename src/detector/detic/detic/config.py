@@ -8,7 +8,7 @@ def add_detic_config(cfg):
 
     # Open-vocabulary classifier
     _C.MODEL.ROI_BOX_HEAD.USE_ZEROSHOT_CLS = False # Use fixed classifier for open-vocabulary detection
-    _C.MODEL.ROI_BOX_HEAD.ZEROSHOT_WEIGHT_PATH = 'datasets/metadata/lvis_v1_clip_a+cname.npy'
+    _C.MODEL.ROI_BOX_HEAD.ZEROSHOT_WEIGHT_PATH = 'src/detector/detic/datasets/metadata/lvis_v1_clip_a+cname.npy'
     _C.MODEL.ROI_BOX_HEAD.ZEROSHOT_WEIGHT_DIM = 512
     _C.MODEL.ROI_BOX_HEAD.NORM_WEIGHT = True
     _C.MODEL.ROI_BOX_HEAD.NORM_TEMP = 50.0

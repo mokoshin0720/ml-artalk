@@ -56,6 +56,7 @@ def setup_cfg(args):
     cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = args.confidence_threshold
     cfg.MODEL.PANOPTIC_FPN.COMBINE.INSTANCES_CONFIDENCE_THRESH = args.confidence_threshold
     cfg.MODEL.ROI_BOX_HEAD.ZEROSHOT_WEIGHT_PATH = 'rand' # load later
+    cfg.MODEL.WEIGHTS = 'models/detic/Detic_LCOCOI21k_CLIP_SwinB_896b32_4x_ft4x_max-size.pth'
     if not args.pred_all_class:
         cfg.MODEL.ROI_HEADS.ONE_CLASS_PER_PROPOSAL = True
     cfg.freeze()
@@ -227,3 +228,5 @@ if __name__ == "__main__":
             output_file.release()
         else:
             cv2.destroyAllWindows()
+    
+    print('Done!!')

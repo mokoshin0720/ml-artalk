@@ -57,7 +57,7 @@ model.roi_heads.update(
             cls_score=L(ZeroShotClassifier)(
                 input_shape=ShapeSpec(channels=1024),
                 num_classes=1203,
-                zs_weight_path='datasets/metadata/lvis_v1_clip_a+cname.npy',
+                zs_weight_path='src/detector/detic/datasets/metadata/lvis_v1_clip_a+cname.npy',
                 norm_weight=True,
                 # use_bias=-4.6,
             ),

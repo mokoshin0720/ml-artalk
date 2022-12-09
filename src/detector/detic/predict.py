@@ -30,7 +30,7 @@ class Predictor(cog.Predictor):
         cfg.MODEL.ROI_HEADS.ONE_CLASS_PER_PROPOSAL = True
         self.predictor = DefaultPredictor(cfg)
         self.BUILDIN_CLASSIFIER = {
-            'lvis': 'datasets/metadata/lvis_v1_clip_a+cname.npy',
+            'lvis': 'src/detector/detic/datasets/metadata/lvis_v1_clip_a+cname.npy',
             'objects365': 'datasets/metadata/o365_clip_a+cnamefix.npy',
             'openimages': 'datasets/metadata/oid_clip_a+cname.npy',
             'coco': 'datasets/metadata/coco_clip_a+cname.npy',
