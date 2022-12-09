@@ -38,7 +38,7 @@ fairscale
 opencv-python
 pycocotools
 mss
-
+ftfy
 
 # torch
 torch
