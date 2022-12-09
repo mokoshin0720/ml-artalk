@@ -26,7 +26,7 @@ Replace `cudatoolkit=11.0` above with the appropriate CUDA version on your machi
 
 ```python
 import torch
-import clip
+import detector.detic.third_party.CLIP.clip
 from PIL import Image
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -90,7 +90,7 @@ The code below performs zero-shot prediction using CLIP, as shown in Appendix B 
 
 ```python
 import os
-import clip
+import detector.detic.third_party.CLIP.clip
 import torch
 from torchvision.datasets import CIFAR100
 
@@ -144,7 +144,7 @@ The example below uses [scikit-learn](https://scikit-learn.org/) to perform logi
 
 ```python
 import os
-import clip
+import detector.detic.third_party.CLIP.clip
 import torch
 
 import numpy as np

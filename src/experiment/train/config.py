@@ -1,5 +1,5 @@
 import pandas as pd
-from experiment.train.utils import clip_gradient
+from experiment.train.utils import detector.detic.third_party.CLIP.clip_gradient
 import pickle
 from experiment.utils.vocab import Vocabulary
 

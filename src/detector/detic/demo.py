@@ -90,13 +90,13 @@ def get_parser():
     )
     parser.add_argument(
         "--vocabulary",
-        default="lvis",
+        default="custom",
         choices=['lvis', 'openimages', 'objects365', 'coco', 'custom'],
         help="",
     )
     parser.add_argument(
         "--custom_vocabulary",
-        default="",
+        default="coffe, laptop",
         help="",
     )
     parser.add_argument("--pred_all_class", action='store_true')
@@ -145,6 +145,8 @@ if __name__ == "__main__":
 
     print('----------------------------------')
     print('start demo...')
+    print('input image {}'.format(args.input))
+    print('search word {}'.format(args.custom_vocabulary))
     print('----------------------------------')
     if args.input:
         if len(args.input) == 1:

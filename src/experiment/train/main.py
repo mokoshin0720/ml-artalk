@@ -30,6 +30,7 @@ def train(conf):
     
     if not os.path.exists(conf['model_path']):
         os.makedirs(conf['model_path'])
+        os.chmod(conf['model_path'],0777)
 
     criterion = nn.CrossEntropyLoss()
 

@@ -3,7 +3,7 @@ import pytest
 import torch
 from PIL import Image
 
-import clip
+import detector.detic.third_party.CLIP.clip
 
 
 @pytest.mark.parametrize('model_name', clip.available_models())

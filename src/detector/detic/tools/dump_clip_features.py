@@ -60,7 +60,7 @@ if __name__ == '__main__':
     print('sentences_synonyms', len(sentences_synonyms), \
         sum(len(x) for x in sentences_synonyms))
     if args.model == 'clip':
-        import clip
+        import detector.detic.third_party.CLIP.clip
         print('Loading CLIP')
         model, preprocess = clip.load(args.clip_model, device=device)
         if args.avg_synonyms:

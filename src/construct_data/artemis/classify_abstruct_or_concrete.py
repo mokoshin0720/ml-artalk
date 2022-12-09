@@ -68,6 +68,7 @@ def train(x_train, x_test, y_train, y_test):
         
         if not os.path.exists('models/abstract_classifier'):
             os.makedirs('models/abstract_classifier')
+            os.chmod("models/abstract_classifier", 0777)
         filename = 'models/abstract_classifier/{}.sav'.format(name)
         pickle.dump(clf, open(filename, 'wb'))
         

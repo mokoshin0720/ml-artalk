@@ -42,6 +42,7 @@ _MODELS = {
 
 def _download(url: str, root: str):
     os.makedirs(root, exist_ok=True)
+    
     filename = os.path.basename(url)
 
     expected_sha256 = url.split("/")[-2]

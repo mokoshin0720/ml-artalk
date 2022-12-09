@@ -8,6 +8,7 @@ import torch
 from torch import nn
 import torch
 
+import detector.detic.third_party.CLIP.clip as clip
 from detector.detic.third_party.CLIP.clip.simple_tokenizer import SimpleTokenizer as _Tokenizer
 
 __all__ = ["tokenize"]
@@ -174,7 +175,7 @@ class CLIPTEXT(nn.Module):
 def build_text_encoder(pretrain=True):
     text_encoder = CLIPTEXT()
     if pretrain:
-        import clip
+        import detector.detic.third_party.CLIP.clip
         pretrained_model, _ = clip.load("ViT-B/32", device='cpu')
         state_dict = pretrained_model.state_dict()
         to_delete_keys = ["logit_scale", "input_resolution", \
