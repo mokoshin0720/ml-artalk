@@ -16,14 +16,14 @@ from detector.detectron.detectron2.modeling.box_regression import Box2BoxTransfo
 from detector.detectron.detectron2.model_zoo import get_config
 from fvcore.common.param_scheduler import CosineParamScheduler
 
-from detic.modeling.roi_heads.zero_shot_classifier import ZeroShotClassifier
-from detic.modeling.roi_heads.detic_roi_heads import DeticCascadeROIHeads
-from detic.modeling.roi_heads.detic_fast_rcnn import DeticFastRCNNOutputLayers
-from detic.data.custom_dataset_mapper import CustomDatasetMapper
-from detic.modeling.meta_arch.custom_rcnn import CustomRCNN
-from detic.data.custom_dataset_dataloader import build_custom_train_loader
-from detic.data.custom_dataset_dataloader import MultiDatasetSampler
-from detic.data.custom_dataset_dataloader import get_detection_dataset_dicts_with_source
+from detector.detic.detic.modeling.roi_heads.zero_shot_classifier import ZeroShotClassifier
+from detector.detic.detic.modeling.roi_heads.detic_roi_heads import DeticCascadeROIHeads
+from detector.detic.detic.modeling.roi_heads.detic_fast_rcnn import DeticFastRCNNOutputLayers
+from detector.detic.detic.data.custom_dataset_mapper import CustomDatasetMapper
+from detector.detic.detic.modeling.meta_arch.custom_rcnn import CustomRCNN
+from detector.detic.detic.data.custom_dataset_dataloader import build_custom_train_loader
+from detector.detic.detic.data.custom_dataset_dataloader import MultiDatasetSampler
+from detector.detic.detic.data.custom_dataset_dataloader import get_detection_dataset_dicts_with_source
 
 default_configs = get_config('new_baselines/mask_rcnn_R_50_FPN_100ep_LSJ.py')
 dataloader = default_configs['dataloader']

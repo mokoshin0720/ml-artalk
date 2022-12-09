@@ -1,81 +1,110 @@
-from construct_data.detic.detectron2.utils.logger import setup_logger
-setup_logger()
-
-import numpy as np
-import cv2
-import pprint
+import glob
 import os
-import traceback
+import tqdm
+import time
+import multiprocessing as mp
+from detector.detectron.detectron2.config.config import get_cfg
+from detector.detic.third_party.CenterNet2.centernet.config import add_centernet_config
+from detector.detic.detic.config import add_detic_config
+from detector.detic.detic.predictor import VisualizationDemo
+from detector.detectron.detectron2.data.detection_utils import read_image
+import argparse
 
-from construct_data.detic.detectron2 import model_zoo
-from construct_data.detic.detectron2.engine import DefaultPredictor
-from construct_data.detic.detectron2.config import get_cfg
-from construct_data.detic.detectron2.utils.visualizer import Visualizer
-from construct_data.detic.detectron2.data import MetadataCatalog
-
-def panoptic_segmentation(filename: str):
-    cfg = get_cfg()
-    cfg.merge_from_file(model_zoo.get_config_file("COCO-PanopticSegmentation/panoptic_fpn_R_101_3x.yaml"))
-    cfg.MODEL.PANOPTIC_FPN.COMBINE.INSTANCES_CONFIDENCE_THRESH = 0.7
-    cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-PanopticSegmentation/panoptic_fpn_R_101_3x.yaml")
-    predictor = DefaultPredictor(cfg)
+def setup_args(input_image, output_image, search_method, search_words, confidence_threshold):
+    parser = argparse.ArgumentParser(description="Detectron2 demo for builtin configs")
+    parser.add_argument(
+        "--config-file",
+        default="src/detector/detic/configs/Detic_LCOCOI21k_CLIP_SwinB_896b32_4x_ft4x_max-size.yaml",
+    )
+    parser.add_argument(
+        "--input",
+        nargs="+",
+        default=[input_image],
+    )
+    parser.add_argument(
+        "--output",
+        default=output_image
+    )
+    parser.add_argument("--pred_all_class", action='store_true')
+    parser.add_argument(
+        "--confidence-threshold",
+        type=float,
+        default=confidence_threshold,
+    )
+    parser.add_argument(
+        "--opts",
+        default=[],
+    )
     
-    im = cv2.imread(filename)
-    panoptic_seg, segments_info = predictor(im)["panoptic_seg"]
-    
-    v = Visualizer(im[:, :, ::-1], MetadataCatalog.get(cfg.DATASETS.TRAIN[0]), scale=1.2)
-    v = v.draw_panoptic_seg_predictions(panoptic_seg.to("cpu"), segments_info)
-    cv2.imwrite('person2.png', v.get_image()[:, :, ::-1])
-    
-def get_segmentation_pixel(filename: str, object: str):
-    result = {}
-    result['object'] = object
-    
-    cfg = get_cfg()
-    cfg.merge_from_file(model_zoo.get_config_file("COCO-PanopticSegmentation/panoptic_fpn_R_101_3x.yaml"))
-    cfg.MODEL.PANOPTIC_FPN.COMBINE.INSTANCES_CONFIDENCE_THRESH = 0.7
-    cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-PanopticSegmentation/panoptic_fpn_R_101_3x.yaml")
-    predictor = DefaultPredictor(cfg)
-    
-    im = cv2.imread(filename)
-    panoptic_seg, segments_info = predictor(im)["panoptic_seg"]
-    
-    v = Visualizer(im[:, :, ::-1], MetadataCatalog.get(cfg.DATASETS.TRAIN[0]), scale=1.2)
-    
-    try:
-        mask = v.get_panoptic_pixel(panoptic_seg.to('cpu'), segments_info, object)
-        print(mask)
-    except:
-        traceback.print_exc()
-
-# def get_segmentation_pixel(filename: str ,object: str):
-#     cfg = get_cfg()
-#     cfg.merge_from_file(model_zoo.get_config_file("COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml"))
-#     cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5  # set threshold for this model
-
-#     cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml")
-#     predictor = DefaultPredictor(cfg)
-
-#     im = cv2.imread(filename)
-#     outputs = predictor(im)
-    
-#     target = MetadataCatalog.get(cfg.DATASETS.TRAIN[0]).thing_classes.index(object)
-#     classes = np.asarray(outputs['instances'].to('cpu').pred_classes)
-#     masks = np.asarray(outputs['instances'].to('cpu').pred_masks)[classes==target].astype('uint8')
-#     contours = [cv2.findContours(m, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[0] for m in masks]
-#     con = np.asarray(contours)[0]
-#     for i in range(1, len(masks)):
-#         con = con + np.asarray(contours)[i]
+    if search_method == 'custom':
+        parser.add_argument(
+            "--vocabulary",
+            default="custom",
+            choices=['lvis', 'openimages', 'objects365', 'coco', 'custom'],
+        )
+        parser.add_argument(
+            "--custom_vocabulary",
+            default=search_words,
+        )
+    elif search_method == 'lvis':
+        parser.add_argument(
+            "--vocabulary",
+            default="lvis",
+            choices=['lvis', 'openimages', 'objects365', 'coco', 'custom'],
+        )
         
-#     im_con = im.copy()
-#     output = cv2.drawContours(im_con, con, -1, (0, 255, 0), 2)
-#     cv2.imwrite('person.png', output)
+    return parser
+
+def setup_cfg(args):
+    cfg = get_cfg()
+    
+    cfg.MODEL.DEVICE="cpu"
+    
+    add_centernet_config(cfg)
+    add_detic_config(cfg)
+    cfg.merge_from_file(args.config_file)
+    cfg.merge_from_list(args.opts)
+    
+    # Set score_threshold for builtin models
+    cfg.MODEL.RETINANET.SCORE_THRESH_TEST = args.confidence_threshold
+    cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = args.confidence_threshold
+    cfg.MODEL.PANOPTIC_FPN.COMBINE.INSTANCES_CONFIDENCE_THRESH = args.confidence_threshold
+    cfg.MODEL.ROI_BOX_HEAD.ZEROSHOT_WEIGHT_PATH = 'rand' # load later
+    
+    model_weights = 'models/detic/Detic_LCOCOI21k_CLIP_SwinB_896b32_4x_ft4x_max-size.pth'
+    cfg.MODEL.WEIGHTS = model_weights
+    
+    if not args.pred_all_class:
+        cfg.MODEL.ROI_HEADS.ONE_CLASS_PER_PROPOSAL = True
+
+    cfg.freeze()
+    
+    return cfg
 
 if __name__ == '__main__':
-    np.set_printoptions(threshold=np.inf)
+    mp.set_start_method("spawn", force=True)
     
-    img_file = 'data/wikiart/Baroque/adriaen-brouwer_drinkers-in-the-yard.jpg'
-    object = 'person'
-    # get_segmentation_pixel(img_file, object)
-    # panoptic_segmentation(img_file)
-    get_segmentation_pixel(img_file, object)
+    args = setup_args(
+        input_image='data/detic/desk.jpg',
+        output_image='output.jpg',
+        search_method='custom',
+        search_words='coffe,laptop',
+        confidence_threshold=0.5
+    ).parse_args()
+    cfg = setup_cfg(args)
+    
+    demo = VisualizationDemo(cfg, args)
+    args.input = glob.glob(os.path.expanduser(args.input[0]))
+    assert args.input, "The input path(s) was not found"
+    for path in tqdm.tqdm(args.input, disable=not args.output):
+            img = read_image(path, format="BGR")
+            start_time = time.time()
+            predictions, visualized_output = demo.run_on_image(img)
+    if os.path.isdir(args.output):
+        assert os.path.isdir(args.output), args.output
+        out_filename = os.path.join(args.output, os.path.basename(path))
+    else:
+        assert len(args.input) == 1, "Please specify a directory with args.output"
+        out_filename = args.output
+    
+    visualized_output.save(out_filename)

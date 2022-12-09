@@ -16,9 +16,9 @@ from detector.detectron.detectron2.modeling.box_regression import Box2BoxTransfo
 from detector.detectron.detectron2.model_zoo import get_config
 from fvcore.common.param_scheduler import CosineParamScheduler
 
-from detic.modeling.roi_heads.zero_shot_classifier import ZeroShotClassifier
-from detic.modeling.roi_heads.detic_roi_heads import DeticCascadeROIHeads
-from detic.modeling.roi_heads.detic_fast_rcnn import DeticFastRCNNOutputLayers
+from detector.detic.detic.modeling.roi_heads.zero_shot_classifier import ZeroShotClassifier
+from detector.detic.detic.modeling.roi_heads.detic_roi_heads import DeticCascadeROIHeads
+from detector.detic.detic.modeling.roi_heads.detic_fast_rcnn import DeticFastRCNNOutputLayers
 
 default_configs = get_config('new_baselines/mask_rcnn_R_50_FPN_100ep_LSJ.py')
 dataloader = default_configs['dataloader']

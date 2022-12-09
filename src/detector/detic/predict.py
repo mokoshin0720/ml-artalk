@@ -14,9 +14,9 @@ from detector.detectron.detectron2.data import MetadataCatalog
 # Detic libraries
 sys.path.insert(0, 'third_party/CenterNet2/')
 from detector.detic.third_party.CenterNet2.centernet.config import add_centernet_config
-from detic.config import add_detic_config
-from detic.modeling.utils import reset_cls_test
-from detic.modeling.text.text_encoder import build_text_encoder
+from detector.detic.detic.config import add_detic_config
+from detector.detic.detic.modeling.utils import reset_cls_test
+from detector.detic.detic.modeling.text.text_encoder import build_text_encoder
 
 class Predictor(cog.Predictor):
     def setup(self):

@@ -18,9 +18,9 @@ from detector.detectron.detectron2.utils.logger import setup_logger
 
 sys.path.insert(0, 'third_party/CenterNet2/')
 from detector.detic.third_party.CenterNet2.centernet.config import add_centernet_config
-from detic.config import add_detic_config
+from detector.detic.detic.config import add_detic_config
 
-from detic.predictor import VisualizationDemo
+from detector.detic.detic.predictor import VisualizationDemo
 
 # Fake a video capture object OpenCV style - half width, half height of first screen using MSS
 class ScreenGrab:

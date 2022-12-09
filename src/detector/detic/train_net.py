@@ -41,14 +41,14 @@ sys.path.insert(0, 'third_party/CenterNet2/')
 from detector.detic.third_party.CenterNet2.centernet.config import add_centernet_config
 
 sys.path.insert(0, 'third_party/Deformable-DETR')
-from detic.config import add_detic_config
-from detic.data.custom_build_augmentation import build_custom_augmentation
-from detic.data.custom_dataset_dataloader import  build_custom_train_loader
-from detic.data.custom_dataset_mapper import CustomDatasetMapper, DetrDatasetMapper
-from detic.custom_solver import build_custom_optimizer
-from detic.evaluation.oideval import OIDEvaluator
-from detic.evaluation.custom_coco_eval import CustomCOCOEvaluator
-from detic.modeling.utils import reset_cls_test
+from detector.detic.detic.config import add_detic_config
+from detector.detic.detic.data.custom_build_augmentation import build_custom_augmentation
+from detector.detic.detic.data.custom_dataset_dataloader import  build_custom_train_loader
+from detector.detic.detic.data.custom_dataset_mapper import CustomDatasetMapper, DetrDatasetMapper
+from detector.detic.detic.custom_solver import build_custom_optimizer
+from detector.detic.detic.evaluation.oideval import OIDEvaluator
+from detector.detic.detic.evaluation.custom_coco_eval import CustomCOCOEvaluator
+from detector.detic.detic.modeling.utils import reset_cls_test
 
 
 logger = logging.getLogger("detectron2")
