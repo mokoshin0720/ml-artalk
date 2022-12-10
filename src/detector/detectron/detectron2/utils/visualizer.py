@@ -405,7 +405,8 @@ class Visualizer:
         keypoints = predictions.pred_keypoints if predictions.has("pred_keypoints") else None
 
         if predictions.has("pred_masks"):
-            masks = np.asarray(predictions.pred_masks)
+            masks = np.asarray(predictions.pred_masks.to('cpu'))
+            # masks = np.asarray(predictions.pred_masks)
             masks = [GenericMask(x, self.output.height, self.output.width) for x in masks]
         else:
             masks = None
@@ -650,7 +651,8 @@ class Visualizer:
         """
         num_instances = 0
         if boxes is not None:
-            boxes = self._convert_boxes(boxes)
+            # boxes = self._convert_boxes(boxes)
+            boxes = self._convert_boxes(boxes.to('cpu'))
             num_instances = len(boxes)
         if masks is not None:
             masks = self._convert_masks(masks)

@@ -57,7 +57,8 @@ class VisualizationDemo(object):
             classifier = BUILDIN_CLASSIFIER[args.vocabulary]
 
         num_classes = len(self.metadata.thing_classes)
-        self.cpu_device = torch.device("cpu")
+        # self.cpu_device = torch.device("cpu")
+        self.device = torch.device('cuda:0') if torch.cuda.is_available() else torch.device('cpu')
         self.instance_mode = instance_mode
 
         self.parallel = parallel
@@ -95,7 +96,8 @@ class VisualizationDemo(object):
                     predictions["sem_seg"].argmax(dim=0).to(self.cpu_device)
                 )
             if "instances" in predictions:
-                instances = predictions["instances"].to(self.cpu_device)
+                # instances = predictions["instances"].to(self.cpu_device)
+                instances = predictions["instances"].to(self.device)
                 vis_output = visualizer.draw_instance_predictions(predictions=instances)
                 
                 labels = visualizer.get_labels(predictions=instances)
