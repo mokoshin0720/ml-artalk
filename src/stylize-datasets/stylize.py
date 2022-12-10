@@ -10,31 +10,48 @@ import torch.nn as nn
 import torchvision.transforms
 from torchvision.utils import save_image
 from tqdm import tqdm
+import os
 
 parser = argparse.ArgumentParser(description='This script applies the AdaIN style transfer method to arbitrary datasets.')
-parser.add_argument('--content-dir', type=str,
+parser.add_argument('--content-dir', 
+                    type=str,
+                    default='data/detic', # FIXME: 正しいimagenetのパスに変更
                     help='Directory path to a batch of content images')
-parser.add_argument('--style-dir', type=str,
+parser.add_argument('--style-dir', 
+                    type=str,
+                    default='data/resized',
                     help='Directory path to a batch of style images')
-parser.add_argument('--output-dir', type=str, default='output',
+parser.add_argument('--output-dir', 
+                    type=str, 
+                    default='data/stylized',
                     help='Directory to save the output images')
-parser.add_argument('--num-styles', type=int, default=1, help='Number of styles to \
-                        create for each image (default: 1)')
-parser.add_argument('--alpha', type=float, default=1.0,
-                    help='The weight that controls the degree of \
-                          stylization. Should be between 0 and 1')
-parser.add_argument('--extensions', nargs='+', type=str, default=['png', 'jpeg', 'jpg'], help='List of image extensions to scan style and content directory for (case sensitive), default: png, jpeg, jpg')
+parser.add_argument('--num-styles', 
+                    type=int, 
+                    default=1, 
+                    help='Number of styles to create for each image (default: 1)')
+parser.add_argument('--alpha', 
+                    type=float, 
+                    default=1.0, # FIXME: 変更量の設定
+                    help='The weight that controls the degree of stylization. Should be between 0 and 1')
+parser.add_argument('--extensions', 
+                    nargs='+', 
+                    type=str, 
+                    default=['png', 'jpeg', 'jpg'], 
+                    help='List of image extensions to scan style and content directory for (case sensitive), default: png, jpeg, jpg')
 
 # Advanced options
-parser.add_argument('--content-size', type=int, default=0,
-                    help='New (minimum) size for the content image, \
-                    keeping the original size if set to 0')
-parser.add_argument('--style-size', type=int, default=512,
-                    help='New (minimum) size for the style image, \
-                    keeping the original size if set to 0')
-parser.add_argument('--crop', type=int, default=0,
-                    help='If set to anything else than 0, center crop of this size will be applied to the content image \
-                    after resizing in order to create a squared image (default: 0)')
+parser.add_argument('--content-size', 
+                    type=int, 
+                    default=0,
+                    help='New (minimum) size for the content image, keeping the original size if set to 0')
+parser.add_argument('--style-size', 
+                    type=int, 
+                    default=0,
+                    help='New (minimum) size for the style image, keeping the original size if set to 0')
+parser.add_argument('--crop', 
+                    type=int, 
+                    default=0,
+                    help='If set to anything else than 0, center crop of this size will be applied to the content image after resizing in order to create a squared image (default: 0)')
 
 # random.seed(131213)
 
@@ -98,8 +115,8 @@ def main():
     decoder.eval()
     vgg.eval()
 
-    decoder.load_state_dict(torch.load('models/decoder.pth'))
-    vgg.load_state_dict(torch.load('models/vgg_normalised.pth'))
+    decoder.load_state_dict(torch.load('models/stylize/decoder.pth'))
+    vgg.load_state_dict(torch.load('models/stylize/vgg_normalised.pth'))
     vgg = nn.Sequential(*list(vgg.children())[:31])
 
     vgg.to(device)
@@ -136,6 +153,7 @@ def main():
                     # create directory structure if it does not exist
                     if not out_dir.is_dir():
                         out_dir.mkdir(parents=True)
+                        os.chmod(out_dir, 0o777)
 
                     content_name = content_path.stem
                     style_name = style_path.stem
