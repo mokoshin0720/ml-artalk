@@ -5,6 +5,7 @@ import multiprocessing as mp
 from collections import deque
 import cv2
 import torch
+import uuid
 
 from detector.detectron.detectron2.data import MetadataCatalog
 from detector.detectron.detectron2.engine.defaults import DefaultPredictor
@@ -47,7 +48,7 @@ class VisualizationDemo(object):
                 Useful since the visualization logic can be slow.
         """
         if args.vocabulary == 'custom':
-            self.metadata = MetadataCatalog.get("__unused")
+            self.metadata = MetadataCatalog.get(str(uuid.uuid1()))
             self.metadata.thing_classes = args.custom_vocabulary.split(',')
             classifier = get_clip_embeddings(self.metadata.thing_classes)
         else:

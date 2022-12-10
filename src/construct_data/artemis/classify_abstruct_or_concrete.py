@@ -68,7 +68,7 @@ def train(x_train, x_test, y_train, y_test):
         
         if not os.path.exists('models/abstract_classifier'):
             os.makedirs('models/abstract_classifier')
-            os.chmod("models/abstract_classifier", 0777)
+            os.chmod("models/abstract_classifier", 0o777)
         filename = 'models/abstract_classifier/{}.sav'.format(name)
         pickle.dump(clf, open(filename, 'wb'))
         
@@ -145,24 +145,7 @@ if __name__ == "__main__":
     classifier =  train(x_train, x_test, y_train, y_test)
     plot_graphes(classifier, x_test, y_test)
     
-    
     # for token in nlp("Have a seat in that chair with comfort and drink some juice to soothe your thirst."):
     #     if token.pos_ == 'NOUN':
     #         result = classify(classifier, token)
     #         print(token, result)
-    
-    
-    
-    # result
-    #                         train      test
-    # RBF SVM              0.885744  0.836527
-    # Linear SVM           0.835384  0.822113
-    # Logistic Regression  0.833099  0.819652
-    # Nearest Neighbors    0.851072  0.802953
-    # Random Forest        0.951090  0.802953
-    # Polynomial SVM       0.846019  0.771840
-    # Sigmoid SVM          0.733960  0.733169
-    # Decision Tree        0.951090  0.728072
-    # Naive Bayes          0.669626  0.677448
-    # 閾値の数: 1215
-    # auc: 0.9062162082955416

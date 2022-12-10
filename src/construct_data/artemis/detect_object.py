@@ -1,7 +1,6 @@
 import glob
 import os
 import tqdm
-import time
 import multiprocessing as mp
 from detector.detectron.detectron2.config.config import get_cfg
 from detector.detic.third_party.CenterNet2.centernet.config import add_centernet_config
@@ -111,7 +110,7 @@ def get_object_info(input_image, search_word, confidence_threshold):
     args.input = glob.glob(os.path.expanduser(args.input[0]))
     assert args.input, "The input path(s) was not found"
     
-    for path in tqdm.tqdm(args.input, disable=not args.output):
+    for path in args.input:
         img = read_image(path, format="BGR")
         predict_info, visualized_output, labels = demo.run_on_image(img)
         
