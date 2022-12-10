@@ -7,21 +7,24 @@ if __name__ == '__main__':
     origin_df = pd.read_csv('data/artemis_dataset.csv')
     idx2object_df = pd.read_csv(filename)
     
-    checked_sentences = []
+    checked_filenames = []
     
     for index, row in idx2object_df.iterrows():
         if index > 100: break
         
         sentence_id = row['sentence_id']
-        if sentence_id in checked_sentences: continue
-        
-        checked_sentences.append(sentence_id)
-        object_list = idx2object_df[idx2object_df['sentence_id'] == sentence_id]['object'].tolist()
-        object_list = ','.join(object_list)
-        
-        art_style = origin_df.at[sentence_id-1, "art_style"]
-        painting = origin_df.at[sentence_id-1, "painting"]        
+        art_style = origin_df.at[sentence_id, "art_style"]
+        painting = origin_df.at[sentence_id, "painting"]
         image_filename = 'data/wikiart/{}/{}.jpg'.format(art_style, painting)
+        
+        if image_filename in checked_filenames: continue
+        checked_filenames.append(image_filename)
+        
+        sentence_ids = origin_df[(origin_df['art_style'] == art_style) & (origin_df['painting'] == painting)].index
+        print(sentence_ids)
+        
+        object_list = idx2object_df[idx2object_df['sentence_id'].isin(sentence_ids)]['object'].tolist()
+        object_list = ','.join(object_list)
         
         print('--------------------------')
         _, predict_labels = get_object_info(
