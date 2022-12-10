@@ -379,6 +379,12 @@ class Visualizer:
         )
         self._instance_mode = instance_mode
         self.keypoint_threshold = _KEYPOINT_THRESHOLD
+        
+    def get_labels(self, predictions):
+        classes = predictions.pred_classes.tolist() if predictions.has("pred_classes") else None
+        labels = _create_text_labels(classes, None, self.metadata.get("thing_classes", None))
+        
+        return labels
 
     def draw_instance_predictions(self, predictions):
         """

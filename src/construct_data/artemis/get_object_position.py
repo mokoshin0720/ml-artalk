@@ -9,6 +9,7 @@ from detector.detic.detic.config import add_detic_config
 from detector.detic.detic.predictor import VisualizationDemo
 from detector.detectron.detectron2.data.detection_utils import read_image
 import argparse
+from typing import List
 
 def setup_args(input_image, output_image, search_method, search_words, confidence_threshold):
     parser = argparse.ArgumentParser(description="Detectron2 demo for builtin configs")
@@ -52,10 +53,15 @@ def setup_args(input_image, output_image, search_method, search_words, confidenc
             default="lvis",
             choices=['lvis', 'openimages', 'objects365', 'coco', 'custom'],
         )
+        parser.add_argument(
+            "--custom_vocabulary",
+            default='',
+        )
         
     return parser
 
 def setup_cfg(args):
+
     cfg = get_cfg()
     
     cfg.MODEL.DEVICE="cpu"
@@ -81,30 +87,56 @@ def setup_cfg(args):
     
     return cfg
 
-if __name__ == '__main__':
-    mp.set_start_method("spawn", force=True)
-    
-    args = setup_args(
-        input_image='data/detic/desk.jpg',
-        output_image='output.jpg',
-        search_method='custom',
-        search_words='coffe,laptop',
-        confidence_threshold=0.5
-    ).parse_args()
-    cfg = setup_cfg(args)
-    
-    demo = VisualizationDemo(cfg, args)
-    args.input = glob.glob(os.path.expanduser(args.input[0]))
-    assert args.input, "The input path(s) was not found"
-    for path in tqdm.tqdm(args.input, disable=not args.output):
-            img = read_image(path, format="BGR")
-            start_time = time.time()
-            predictions, visualized_output = demo.run_on_image(img)
+def save_output_image(args, path):
     if os.path.isdir(args.output):
         assert os.path.isdir(args.output), args.output
         out_filename = os.path.join(args.output, os.path.basename(path))
     else:
         assert len(args.input) == 1, "Please specify a directory with args.output"
         out_filename = args.output
+
+def get_object_info(input_image, search_word, confidence_threshold):
+    mp.set_start_method("spawn", force=True)
     
+    args = setup_args(
+        input_image=input_image,
+        output_image='data/detic/out.jpg',
+        search_method='custom',
+        search_words=search_word,
+        confidence_threshold=confidence_threshold,
+    ).parse_args()
+    cfg = setup_cfg(args)
+    
+    demo = VisualizationDemo(cfg, args)
+    args.input = glob.glob(os.path.expanduser(args.input[0]))
+    assert args.input, "The input path(s) was not found"
+    
+    for path in tqdm.tqdm(args.input, disable=not args.output):
+        img = read_image(path, format="BGR")
+        predict_info, visualized_output, labels = demo.run_on_image(img)
+        
+    out_filename = args.output
     visualized_output.save(out_filename)
+    
+    return predict_info, labels
+
+def object_detection_rate(search_words: str, predict_object_list: List[str]):
+    search_word_list = search_words.split(',')
+    
+    cnt = 0
+    for w in search_word_list:
+        if w in predict_object_list: cnt += 1
+        
+    return cnt / len(search_word_list)
+
+if __name__ == '__main__':
+    search_words = 'person, glasses, tie, ear'
+    
+    predict_info, labels = get_object_info(
+        input_image='data/detic/person.jpeg',
+        search_word=search_words,
+        confidence_threshold=0.01
+    )
+    
+    rate = object_detection_rate(search_words, labels)
+    print(rate)

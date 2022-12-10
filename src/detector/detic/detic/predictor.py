@@ -82,6 +82,7 @@ class VisualizationDemo(object):
         # Convert image from OpenCV BGR format to Matplotlib RGB format.
         image = image[:, :, ::-1]
         visualizer = Visualizer(image, self.metadata, instance_mode=self.instance_mode)
+        
         if "panoptic_seg" in predictions:
             panoptic_seg, segments_info = predictions["panoptic_seg"]
             vis_output = visualizer.draw_panoptic_seg_predictions(
@@ -95,9 +96,11 @@ class VisualizationDemo(object):
             if "instances" in predictions:
                 instances = predictions["instances"].to(self.cpu_device)
                 vis_output = visualizer.draw_instance_predictions(predictions=instances)
+                
+                labels = visualizer.get_labels(predictions=instances)
 
-        return predictions, vis_output
-
+        return predictions, vis_output, labels
+    
     def _frame_from_video(self, video):
         while video.isOpened():
             success, frame = video.read()
