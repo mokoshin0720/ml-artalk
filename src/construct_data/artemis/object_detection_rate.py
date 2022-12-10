@@ -1,16 +1,46 @@
-import csv
 import pandas as pd
 from construct_data.artemis.detect_object import get_object_info, object_detection_rate
+import matplotlib.pyplot as plt
+import statistics
 
 if __name__ == '__main__':
-    filename = 'data/idx2object.csv'
+    ratio_dict_by_style = {
+        'Abstract_Expressionism': [],
+        'Action_painting': [],
+        'Analytical_Cubism': [],
+        'Art_Nouveau_Modern': [],
+        'Baroque': [],
+        'Color_Field_Painting': [],
+        'Contemporary_Realism': [],
+        'Cubism': [],
+        'Early_Renaissance': [],
+        'Expressionism': [],
+        'Fauvism': [],
+        'High_Renaissance': [],
+        'Impressionism': [],
+        'Mannerism_Late_Renaissance': [],
+        'Minimalism': [],
+        'Naive_Art_Primitivism': [],
+        'New_Realism': [],
+        'Northern_Renaissance': [],
+        'Pointillism': [],
+        'Pop_Art': [],
+        'Post_Impressionism': [],
+        'Realism': [],
+        'Rococo': [],
+        'Romanticism': [],
+        'Symbolism': [],
+        'Synthetic_Cubism': [],
+        'Ukiyo_e': [],
+    }
+    
     origin_df = pd.read_csv('data/artemis_dataset.csv')
-    idx2object_df = pd.read_csv(filename)
+    idx2object_df = pd.read_csv('data/idx2object_test.csv', header=0)
     
     checked_filenames = []
     
     for index, row in idx2object_df.iterrows():
-        if index > 100: break
+        if index > 10: break
         
         sentence_id = row['sentence_id']
         art_style = origin_df.at[sentence_id, "art_style"]
@@ -35,8 +65,22 @@ if __name__ == '__main__':
         
         rate = object_detection_rate(search_words=object_list, predict_object_list=predict_labels)
         
+        ratio_dict_by_style[art_style].append(rate)
+        
         print('search word: {}'.format(object_list))
         print('predict word: {}'.format(predict_labels))
         print(rate)
+        print(ratio_dict_by_style)
         print('DONE!')
         print('--------------------------')
+    
+    x_pos = [i for i in range(len(ratio_dict_by_style))]
+    labels = [k for k, _ in ratio_dict_by_style.items()]
+    ratios = [statistics.mean(v) for _, v in ratio_dict_by_style.items()]
+    plt.rcParams['font.family'] = 'Noto Sans JP'
+    plt.figure(figsize = (10, 10))
+    plt.bar(x_pos, ratios, tick_label=labels, align='center')
+    plt.xticks(rotation=90)
+    plt.title('絵画スタイルごとの検出率')
+    plt.tight_layout()
+    plt.savefig('detection_rate.png')

@@ -16,7 +16,8 @@ MODEL:
   FPN:
     IN_FEATURES: ["swin1", "swin2", "swin3"]
   RESET_CLS_TESTS: True
-  TEST_CLASSIFIERS: ("datasets/metadata/oid_clip_a+cname.npy","datasets/metadata/o365_clip_a+cnamefix.npy")
+  # TEST_CLASSIFIERS: ("datasets/metadata/oid_clip_a+cname.npy","datasets/metadata/o365_clip_a+cnamefix.npy")
+  TEST_CLASSIFIERS: ("src/detector/detic/datasets/metadata/oid_clip_a+cname.npy","src/detector/detic/datasets/metadata/o365_clip_a+cnamefix.npy")
   TEST_NUM_CLASSES: [500, 365]
 SOLVER:
   MAX_ITER: 180000

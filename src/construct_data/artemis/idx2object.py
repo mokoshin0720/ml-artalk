@@ -5,6 +5,7 @@ from validate import is_valid, get_sconj_like_range
 from classify_abstruct_or_concrete import train
 from tqdm import tqdm
 import pickle
+import os
 
 def extract_noun_chunks(sentence, nlp, classifier):
     doc = nlp(sentence)
@@ -30,7 +31,7 @@ if __name__ == '__main__':
     best_filename = 'models/abstract_classifier/RBF SVM.sav'
     classifier = pickle.load(open(best_filename, 'rb'))
 
-    filename = 'data/artemis_test_dataset.csv'
+    filename = 'data/artemis_train_dataset.csv'
     df = pd.read_csv(filename)
 
     idx2object_list = []
@@ -43,6 +44,7 @@ if __name__ == '__main__':
             idx2object_list.append(idx2object)
             bar.update(1)
 
-    with open('data/idx2object_test.csv', 'w') as file:
+    with open('data/idx2object_train.csv', 'w') as file:
         writer = csv.writer(file, lineterminator='\n')
         writer.writerows(idx2object_list)
+        

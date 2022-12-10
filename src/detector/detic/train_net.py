@@ -205,6 +205,8 @@ def setup(args):
     cfg = get_cfg()
     add_centernet_config(cfg)
     add_detic_config(cfg)
+    
+    args.config_file = 'src/detector/detic/configs/Detic_LCOCOI21k_CLIP_SwinB_896b32_4x_ft4x_max-size.yaml'
     cfg.merge_from_file(args.config_file)
     cfg.merge_from_list(args.opts)
     if '/auto' in cfg.OUTPUT_DIR:

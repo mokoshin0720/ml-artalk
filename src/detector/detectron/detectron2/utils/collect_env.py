@@ -70,7 +70,7 @@ def collect_env_info():
     data.append(("numpy", np.__version__))
 
     try:
-        import detector.detectron.detectron2  # noqa
+        import detector.detectron.detectron2 as detectron2  # noqa
 
         data.append(
             ("detectron2", detectron2.__version__ + " @" + os.path.dirname(detectron2.__file__))

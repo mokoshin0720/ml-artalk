@@ -19,7 +19,9 @@ python ../tools/convert-thirdparty-pretrained-model-to-d2.py --path swin_base_pa
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--path', default='')
+    parser.add_argument('--path', 
+                        default='models/detic/swin_base_patch4_window7_224_22k.pth'
+    )
     args = parser.parse_args()
 
     print('Loading', args.path)

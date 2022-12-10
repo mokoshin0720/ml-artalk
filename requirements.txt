@@ -39,6 +39,7 @@ opencv-python
 pycocotools
 mss
 ftfy
+lvis
 
 # torch
 torch

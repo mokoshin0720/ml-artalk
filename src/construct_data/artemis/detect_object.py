@@ -1,6 +1,5 @@
 import glob
 import os
-import tqdm
 import multiprocessing as mp
 from detector.detectron.detectron2.config.config import get_cfg
 from detector.detic.third_party.CenterNet2.centernet.config import add_centernet_config
