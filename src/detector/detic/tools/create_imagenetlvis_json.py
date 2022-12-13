@@ -3,14 +3,18 @@ import argparse
 import json
 import os
 import cv2
+import nltk
+nltk.download('wordnet')
 from nltk.corpus import wordnet
 from detector.detectron.detectron2.data.detection_utils import read_image
+from PIL import ImageFile
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--imagenet_path', default='datasets/imagenet/ImageNet-LVIS')
-    parser.add_argument('--lvis_meta_path', default='datasets/lvis/lvis_v1_val.json')
-    parser.add_argument('--out_path', default='datasets/imagenet/annotations/imagenet_lvis_image_info.json')
+    parser.add_argument('--imagenet_path', default='data/imagenet/imagenet-lvis/')
+    parser.add_argument('--lvis_meta_path', default='data/lvis/lvis_v1_val.json')
+    parser.add_argument('--out_path', default='data/imagenet/annotations/imagenet_lvis_image_info.json')
     args = parser.parse_args()
 
     print('Loading LVIS meta')

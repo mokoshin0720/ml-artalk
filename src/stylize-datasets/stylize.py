@@ -15,7 +15,7 @@ import os
 parser = argparse.ArgumentParser(description='This script applies the AdaIN style transfer method to arbitrary datasets.')
 parser.add_argument('--content-dir', 
                     type=str,
-                    default='data/detic', # FIXME: 正しいimagenetのパスに変更
+                    default='data/coco/train2017', # FIXME: 正しいimagenetのパスに変更
                     help='Directory path to a batch of content images')
 parser.add_argument('--style-dir', 
                     type=str,
@@ -23,7 +23,7 @@ parser.add_argument('--style-dir',
                     help='Directory path to a batch of style images')
 parser.add_argument('--output-dir', 
                     type=str, 
-                    default='data/stylized',
+                    default='data/coco/train2017-stylized', # FIXME: 正しい保存先フォルダ
                     help='Directory to save the output images')
 parser.add_argument('--num-styles', 
                     type=int, 
@@ -156,9 +156,7 @@ def main():
                         os.chmod(out_dir, 0o777)
 
                     content_name = content_path.stem
-                    style_name = style_path.stem
-                    out_filename = content_name + '-stylized-' + style_name + content_path.suffix
-                    output_name = out_dir.joinpath(out_filename)
+                    output_name = out_dir.joinpath(content_name + content_path.suffix)
 
                     save_image(output, output_name, padding=0) #default image padding is 2.
                     style_img.close()
