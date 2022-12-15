@@ -206,7 +206,8 @@ def setup(args):
     add_centernet_config(cfg)
     add_detic_config(cfg)
     
-    args.config_file = 'src/detector/detic/configs/Detic_LCOCOI21k_CLIP_SwinB_896b32_4x_ft4x_max-size.yaml'
+    # args.config_file = 'src/detector/detic/configs/Detic_LbaseI_CLIP_SwinB_896b32_4x_ft4x_max-size.yaml' # FIXME: 参考にするconfig
+    args.config_file = 'src/detector/detic/configs/BoxSup-C2_Lbase_CLIP_R5021k_640b64_4x.yaml' # FIXME: 参考にするconfig
     cfg.merge_from_file(args.config_file)
     cfg.merge_from_list(args.opts)
     if '/auto' in cfg.OUTPUT_DIR:

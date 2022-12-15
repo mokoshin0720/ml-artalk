@@ -4,7 +4,7 @@ import json
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--ann', default='datasets/lvis/lvis_v1_train.json')
+    parser.add_argument('--ann', default='data/lvis/lvis_v1_train.json')
     args = parser.parse_args()
 
     print('Loading', args.ann)

@@ -128,7 +128,7 @@ dataloader.train = L(build_custom_train_loader)(
     use_diff_bs_size=True,
     dataset_bs=[8, 8 * 4],
     num_datasets=2,
-    num_workers=8,
+    num_workers=8
 )
 
 dataloader.test.dataset.names="lvis_v1_val"

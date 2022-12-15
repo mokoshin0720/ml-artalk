@@ -3,6 +3,8 @@ services:
   artalk:
     environment:
       PYTHONPATH: src/
+      NCCL_DEBUG: INFO
+    ipc: host
     env_file:
       - .env
     build:

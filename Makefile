@@ -22,3 +22,6 @@ install:
 
 top:
 	docker-compose -f docker-compose.${env}.yml top
+
+bash:
+	docker-compose -f docker-compose.prod.yml exec artalk bash

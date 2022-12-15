@@ -351,7 +351,7 @@ MODEL:
     WITH_SOFTMAX_PROP: false
     WS_NUM_PROPS: 128
     ZEROSHOT_WEIGHT_DIM: 512
-    ZEROSHOT_WEIGHT_PATH: datasets/metadata/lvis-21k_clip_a+cname.npy
+    ZEROSHOT_WEIGHT_PATH: src/detector/detic/datasets/metadata/lvis-21k_clip_a+cname.npy
   ROI_HEADS:
     BATCH_SIZE_PER_IMAGE: 512
     IN_FEATURES:

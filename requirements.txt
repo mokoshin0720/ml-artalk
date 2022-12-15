@@ -15,6 +15,7 @@ sentence-transformers
 openpyxl
 xlrd
 seaborn
+markupsafe==2.0.1
 
 # for detectron2
 docutils==0.16
@@ -33,15 +34,16 @@ fvcore
 omegaconf>=2.1.0.dev24
 hydra-core>=1.1.0.dev5
 scipy
-timm
+timm==v0.5.4
 fairscale
 opencv-python
 pycocotools
 mss
 ftfy
 lvis
+tensorboard
 
 # torch
-torch
-torchvision
---find-links https://download.pytorch.org/whl/cu116
+# torch
+# torchvision
+# --find-links https://download.pytorch.org/whl/cu116
