@@ -56,6 +56,9 @@ logger = logging.getLogger("detectron2")
 def do_test(cfg, model):
     results = OrderedDict()
     for d, dataset_name in enumerate(cfg.DATASETS.TEST):
+        print('+++++++++++++++++++++++++++++++++++++')
+        print('start eval {}...'.format(dataset_name))
+        print('+++++++++++++++++++++++++++++++++++++')
         if cfg.MODEL.RESET_CLS_TESTS:
             reset_cls_test(
                 model,
@@ -149,6 +152,9 @@ def do_train(cfg, model, resume=False):
             print('------------------------------------')
             print('{}/{}'.format(iteration, max_iter))
             print('------------------------------------')
+            
+            print(data)
+            print(len(data))
             
             data_time = data_timer.seconds()
             storage.put_scalars(data_time=data_time)
@@ -254,10 +260,6 @@ def main(args):
 if __name__ == "__main__":
     args = default_argument_parser()
     args = args.parse_args()
-    
-    print('****************************')
-    print(args.resume)
-    print('****************************')
     
     if args.num_machines == 1:
         args.dist_url = 'tcp://127.0.0.1:{}'.format(

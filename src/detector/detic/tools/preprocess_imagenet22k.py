@@ -73,7 +73,8 @@ def preprocess():
     # ImageNet folder has 21841 classes (synsets)
 
     i22kdir = '/datasets01/imagenet-22k/062717/'
-    i22ktarlogs = '/checkpoint/imisra/datasets/imagenet-22k/tarindex'
+    # i22ktarlogs = '/checkpoint/imisra/datasets/imagenet-22k/tarindex'
+    i22ktarlogs = 'data/imagenet/imagenet-21k'
     class_names_file = '/checkpoint/imisra/datasets/imagenet-22k/words.txt'
 
     output_dir = '/checkpoint/zhouxy/Datasets/ImageNet/metadata-22k/'

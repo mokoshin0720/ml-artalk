@@ -16,6 +16,7 @@ openpyxl
 xlrd
 seaborn
 markupsafe==2.0.1
+scikit-image
 
 # for detectron2
 docutils==0.16
@@ -42,8 +43,3 @@ mss
 ftfy
 lvis
 tensorboard
-
-# torch
-# torch
-# torchvision
-# --find-links https://download.pytorch.org/whl/cu116

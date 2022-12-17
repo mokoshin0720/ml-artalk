@@ -6,14 +6,14 @@ import json
 import numpy as np
 
 from detector.detectron.detectron2.structures import Boxes, pairwise_iou
-COCO_PATH = 'datasets/coco/annotations/instances_train2017.json'
-IMG_PATH = 'datasets/coco/train2017/'
-LVIS_PATH = 'datasets/lvis/lvis_v1_train.json'
+COCO_PATH = 'data/coco/annotations/instances_train2017.json'
+IMG_PATH = 'data/coco/train2017/'
+LVIS_PATH = 'data/lvis/lvis_v1_train.json'
 NO_SEG = False
 if NO_SEG:
-    SAVE_PATH = 'datasets/lvis/lvis_v1_train+coco_box.json'
+    SAVE_PATH = 'data/lvis/lvis_v1_train+coco_box.json'
 else:
-    SAVE_PATH = 'datasets/lvis/lvis_v1_train+coco_mask.json'
+    SAVE_PATH = 'data/lvis/lvis_v1_train+coco_mask.json'
 THRESH = 0.7
 DEBUG = False
 

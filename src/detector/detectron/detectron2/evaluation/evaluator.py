@@ -7,6 +7,7 @@ from contextlib import ExitStack, contextmanager
 from typing import List, Union
 import torch
 from torch import nn
+from tqdm import tqdm
 
 from detector.detectron.detectron2.utils.comm import get_world_size, is_main_process
 from detector.detectron.detectron2.utils.logger import log_every_n_seconds
@@ -146,7 +147,10 @@ def inference_on_dataset(
         stack.enter_context(torch.no_grad())
 
         start_data_time = time.perf_counter()
+        bar = tqdm(total=total)
         for idx, inputs in enumerate(data_loader): # FIXME: 可視化する
+            bar.update(1)
+            if idx > 1: break
             total_data_time += time.perf_counter() - start_data_time
             if idx == num_warmup:
                 start_time = time.perf_counter()

@@ -162,8 +162,11 @@ class OIDEval:
 
     def _to_mask(self, anns, lvis):
         for ann in anns:
-            rle = lvis.ann_to_rle(ann)
-            ann["segmentation"] = rle
+            # rle = lvis.ann_to_rle(ann)
+            print('-------------------')
+            print(ann)
+            print('-------------------')
+            # ann["segmentation"] = rle
 
     def _prepare(self):
         """Prepare self._gts and self._dts for evaluation based on params."""

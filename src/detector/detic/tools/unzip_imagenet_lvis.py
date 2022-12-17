@@ -5,7 +5,7 @@ import argparse
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--src_path', default='data/imagenet')
-    parser.add_argument('--dst_path', default='data/imagenet-lvis')
+    parser.add_argument('--dst_path', default='data/imagenet/ImageNet-LVIS')
     parser.add_argument('--data_path', default='src/detector/detic/datasets/metadata/imagenet_lvis_wnid.txt')
     args = parser.parse_args()
 

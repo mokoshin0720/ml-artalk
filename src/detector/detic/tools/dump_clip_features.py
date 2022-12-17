@@ -10,7 +10,7 @@ import sys
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--ann', default='data/imagenet/annotations/imagenet_lvis_image_info.json')
-    parser.add_argument('--out_path', default='src/detector/detic/datasets/imagenet/metadata-22k/tar_files.npy')
+    parser.add_argument('--out_path', default='data/imagenet/metadata-22k/tar_files.npy')
     parser.add_argument('--prompt', default='a')
     parser.add_argument('--model', default='clip')
     parser.add_argument('--clip_model', default="ViT-B/32")

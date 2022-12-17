@@ -12,7 +12,7 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--imagenet_path', default='data/imagenet/imagenet-lvis/')
+    parser.add_argument('--imagenet_path', default='data/imagenet/ImageNet-LVIS/')
     parser.add_argument('--lvis_meta_path', default='data/lvis/lvis_v1_val.json')
     parser.add_argument('--out_path', default='data/imagenet/annotations/imagenet_lvis_image_info.json')
     args = parser.parse_args()
