@@ -146,6 +146,10 @@ def do_train(cfg, model, resume=False):
         data_timer = Timer()
         start_time = time.perf_counter()
         for data, iteration in zip(data_loader, range(start_iter, max_iter)):
+            print('------------------------------------')
+            print('{}/{}'.format(iteration, max_iter))
+            print('------------------------------------')
+            
             data_time = data_timer.seconds()
             storage.put_scalars(data_time=data_time)
             step_timer.reset()
@@ -206,8 +210,7 @@ def setup(args):
     add_centernet_config(cfg)
     add_detic_config(cfg)
     
-    # args.config_file = 'src/detector/detic/configs/Detic_LbaseI_CLIP_SwinB_896b32_4x_ft4x_max-size.yaml' # FIXME: 参考にするconfig
-    args.config_file = 'src/detector/detic/configs/BoxSup-C2_Lbase_CLIP_R5021k_640b64_4x.yaml' # FIXME: 参考にするconfig
+    args.config_file = 'src/detector/detic/configs/Detic_LCOCOI21k_CLIP_SwinB_896b32_4x_ft4x_max-size.yaml' # FIXME: 参考にするconfig(Detic_LbaseI_CLIP_SwinB_896b32_4x_ft4x_max-size.yamlで確定)
     cfg.merge_from_file(args.config_file)
     cfg.merge_from_list(args.opts)
     if '/auto' in cfg.OUTPUT_DIR:
@@ -223,6 +226,10 @@ def setup(args):
 
 def main(args):
     cfg = setup(args)
+    
+    print(';***********************************')
+    print(cfg.OUTPUT_DIR)
+    print(';***********************************')
 
     model = build_model(cfg)
     logger.info("Model:\n{}".format(model))
@@ -247,6 +254,11 @@ def main(args):
 if __name__ == "__main__":
     args = default_argument_parser()
     args = args.parse_args()
+    
+    print('****************************')
+    print(args.resume)
+    print('****************************')
+    
     if args.num_machines == 1:
         args.dist_url = 'tcp://127.0.0.1:{}'.format(
             torch.randint(11111, 60000, (1,))[0].item())

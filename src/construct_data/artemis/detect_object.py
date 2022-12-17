@@ -133,7 +133,7 @@ if __name__ == '__main__':
     predict_info, labels = get_object_info(
         input_image='data/detic/person.jpeg',
         search_word=search_words,
-        confidence_threshold=0.01
+        confidence_threshold=0.1
     )
     
     rate = object_detection_rate(search_words, labels)

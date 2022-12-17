@@ -460,7 +460,7 @@ MODEL:
     - 4
     - 5
     PRETRAINED: false
-  WEIGHTS: models/BoxSup-C2_LCOCO_CLIP_SwinB_896b32_4x.pth
+  WEIGHTS: models/detic/BoxSup-C2_LCOCO_CLIP_SwinB_896b32_4x.pth
   WITH_CAPTION: false
 OUTPUT_DIR: ./output/Detic/Detic_LCOCOI21k_CLIP_SwinB_896b32_4x_ft4x_max-size
 QUICK_DEBUG: false

@@ -11,11 +11,13 @@ MODEL:
     IN_FEATURES: ["swin1", "swin2", "swin3"]
   WEIGHTS: "models/detic/BoxSup-C2_Lbase_CLIP_SwinB_896b32_4x.pth"
 SOLVER:
-  MAX_ITER: 180000
-  IMS_PER_BATCH: 4
+  # MAX_ITER: 180000
+  MAX_ITER: 2
+  IMS_PER_BATCH: 1
   # IMS_PER_BATCH: 32
   BASE_LR: 0.0001
-  WARMUP_ITERS: 1000
+  # WARMUP_ITERS: 1000
+  WARMUP_ITERS: 1
   WARMUP_FACTOR: 0.001
 DATASETS:
   TRAIN: ("lvis_v1_train_norare","imagenet_lvis_v1")

@@ -146,7 +146,7 @@ def inference_on_dataset(
         stack.enter_context(torch.no_grad())
 
         start_data_time = time.perf_counter()
-        for idx, inputs in enumerate(data_loader):
+        for idx, inputs in enumerate(data_loader): # FIXME: 可視化する
             total_data_time += time.perf_counter() - start_data_time
             if idx == num_warmup:
                 start_time = time.perf_counter()

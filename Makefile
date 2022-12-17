@@ -25,3 +25,6 @@ top:
 
 bash:
 	docker-compose -f docker-compose.prod.yml exec artalk bash
+
+shell-cmd:
+	docker-compose -f docker-compose.${env}.yml exec bash ${filename}

@@ -1,0 +1,12 @@
+*.kdev4
+__pycache__
+*.pyc
+*~
+/.idea
+stereo/alg-ELAS/build/
+stereo/datasets_middlebury2014/
+segmentation/datasets_*/
+segmentation/algo_*/
+segmentation/temp_unpack_dir
+segmentation/archives
+datasets/
