@@ -260,6 +260,7 @@ def main(args):
 
 
 if __name__ == "__main__":
+    # FIXME: slack通知を導入する
     args = default_argument_parser()
     args = args.parse_args()
     
