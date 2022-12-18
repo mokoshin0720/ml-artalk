@@ -262,6 +262,7 @@ class COCOEvaluator(DatasetEvaluator):
         )
         for task in sorted(tasks):
             assert task in {"bbox", "segm", "keypoints"}, f"Got unknown task: {task}!"
+            if task != 'bbox': continue # MEMO: segmとkeypointsは不要のため削除
             coco_eval = (
                 _evaluate_predictions_on_coco(
                     self._coco_api,

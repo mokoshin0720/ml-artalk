@@ -5,8 +5,8 @@ DATALOADER:
   - box
   - image
   DATASET_BS:
-  - 1
-  - 1
+  - 2
+  - 8
   DATASET_INPUT_SCALE:
   - - 0.1
     - 2.0
@@ -25,10 +25,10 @@ DATALOADER:
     - 400
   DATASET_RATIO:
   - 1
-  - 1
+  - 4
   FILTER_EMPTY_ANNOTATIONS: false
   MULTI_DATASET_GROUPING: true
-  NUM_WORKERS: 0
+  NUM_WORKERS: 2
   REPEAT_THRESHOLD: 0.001
   SAMPLER_TRAIN: MultiDatasetSampler
   TARFILE_PATH: datasets/imagenet/metadata-22k/tar_files.npy
@@ -484,7 +484,7 @@ SOLVER:
   CUSTOM_MULTIPLIER: 1.0
   CUSTOM_MULTIPLIER_NAME: []
   GAMMA: 0.1
-  IMS_PER_BATCH: 1
+  IMS_PER_BATCH: 2
   LR_SCHEDULER_NAME: WarmupCosineLR
   MAX_ITER: 10
   MOMENTUM: 0.9

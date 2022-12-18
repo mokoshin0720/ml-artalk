@@ -71,7 +71,7 @@ def do_test(cfg, model):
         output_folder = os.path.join(
             cfg.OUTPUT_DIR, "inference_{}".format(dataset_name))
         evaluator_type = MetadataCatalog.get(dataset_name).evaluator_type
-
+        
         if evaluator_type == "lvis" or cfg.GEN_PSEDO_LABELS:
             evaluator = LVISEvaluator(dataset_name, cfg, True, output_folder)
         elif evaluator_type == 'coco':
@@ -252,6 +252,8 @@ def main(args):
             model, device_ids=[comm.get_local_rank()], broadcast_buffers=False,
             find_unused_parameters=cfg.FIND_UNUSED_PARAM
         )
+        
+        model = model.module # FIXME: 確認する
 
     do_train(cfg, model, resume=args.resume)
     return do_test(cfg, model)

@@ -28,3 +28,6 @@ bash:
 
 shell-cmd:
 	docker-compose -f docker-compose.${env}.yml exec bash ${filename}
+
+logs:
+	docker-compose -f docker-compose.${env}.yml logs artalk

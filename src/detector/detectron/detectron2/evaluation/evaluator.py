@@ -150,7 +150,7 @@ def inference_on_dataset(
         bar = tqdm(total=total)
         for idx, inputs in enumerate(data_loader): # FIXME: 可視化する
             bar.update(1)
-            if idx > 1: break
+            if idx > 10: break
             total_data_time += time.perf_counter() - start_data_time
             if idx == num_warmup:
                 start_time = time.perf_counter()

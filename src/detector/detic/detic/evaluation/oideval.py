@@ -79,7 +79,7 @@ def compute_average_precision(precision, recall):
 class OIDEval:
     def __init__(
         self, lvis_gt, lvis_dt, iou_type="bbox", expand_pred_label=False, 
-        oid_hierarchy_path='./datasets/oid/annotations/challenge-2019-label500-hierarchy.json'):
+        oid_hierarchy_path='data/oid/annotations/challenge-2019-label500-hierarchy.json'):
         """Constructor for OIDEval.
         Args:
             lvis_gt (LVIS class instance, or str containing path of annotation file)
@@ -162,11 +162,11 @@ class OIDEval:
 
     def _to_mask(self, anns, lvis):
         for ann in anns:
-            # rle = lvis.ann_to_rle(ann)
             print('-------------------')
             print(ann)
             print('-------------------')
-            # ann["segmentation"] = rle
+            rle = lvis.ann_to_rle(ann)
+            ann["segmentation"] = rle
 
     def _prepare(self):
         """Prepare self._gts and self._dts for evaluation based on params."""
@@ -575,11 +575,15 @@ class OIDEvaluator(DatasetEvaluator):
 
         self._metadata = MetadataCatalog.get(dataset_name)
         json_file = PathManager.get_local_path(self._metadata.json_file)
+        
         self._oid_api = LVIS(json_file)
+        
         # Test set json files do not contain annotations (evaluation must be
         # performed using the LVIS evaluation server).
         self._do_evaluation = len(self._oid_api.get_ann_ids()) > 0
-        self._mask_on = cfg.MODEL.MASK_ON
+        
+        # self._mask_on = cfg.MODEL.MASK_ON
+        self._mask_on = False # MEMO: READMEにならって修正
 
     def reset(self):
         self._predictions = []
@@ -617,6 +621,7 @@ class OIDEvaluator(DatasetEvaluator):
         PathManager.mkdirs(self._output_dir)
         file_path = os.path.join(
             self._output_dir, "oid_instances_results.json")
+        
         self._logger.info("Saving results to {}".format(file_path))
         with PathManager.open(file_path, "w") as f:
             f.write(json.dumps(self._oid_results))
