@@ -139,6 +139,9 @@ def get_config_file(config_path):
     cfg_file = pkg_resources.resource_filename(
         "detectron2.model_zoo", os.path.join("configs", config_path)
     )
+
+    cfg_file = 'src/detector/detectron/configs/COCO-PanopticSegmentation/panoptic_fpn_R_101_3x.yaml'
+    
     if not os.path.exists(cfg_file):
         raise RuntimeError("{} not available in Model Zoo!".format(config_path))
     return cfg_file

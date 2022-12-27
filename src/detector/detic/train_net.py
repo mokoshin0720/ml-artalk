@@ -233,10 +233,6 @@ def setup(args):
 def main(args):
     cfg = setup(args)
     
-    print(';***********************************')
-    print(cfg.OUTPUT_DIR)
-    print(';***********************************')
-
     model = build_model(cfg)
     logger.info("Model:\n{}".format(model))
     if args.eval_only:

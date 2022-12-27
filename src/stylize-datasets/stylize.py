@@ -10,12 +10,14 @@ import torch.nn as nn
 import torchvision.transforms
 from torchvision.utils import save_image
 from tqdm import tqdm
+import numpy as np
 import os
+import traceback
+from notify.logger import notify_message, notify_fail
 
 parser = argparse.ArgumentParser(description='This script applies the AdaIN style transfer method to arbitrary datasets.')
 parser.add_argument('--content-dir', 
                     type=str,
-                    default='data/coco/train2017', # FIXME: 正しいimagenetのパスに変更
                     help='Directory path to a batch of content images')
 parser.add_argument('--style-dir', 
                     type=str,
@@ -23,7 +25,6 @@ parser.add_argument('--style-dir',
                     help='Directory path to a batch of style images')
 parser.add_argument('--output-dir', 
                     type=str, 
-                    default='data/coco/train2017-stylized', # FIXME: 正しい保存先フォルダ
                     help='Directory to save the output images')
 parser.add_argument('--num-styles', 
                     type=int, 
@@ -31,12 +32,12 @@ parser.add_argument('--num-styles',
                     help='Number of styles to create for each image (default: 1)')
 parser.add_argument('--alpha', 
                     type=float, 
-                    default=1.0, # FIXME: 変更量の設定
+                    default=0.2, # FIXME: 変更量の設定
                     help='The weight that controls the degree of stylization. Should be between 0 and 1')
 parser.add_argument('--extensions', 
                     nargs='+', 
                     type=str, 
-                    default=['png', 'jpeg', 'jpg'], 
+                    default=['png', 'jpeg', 'jpg', 'JPEG'], 
                     help='List of image extensions to scan style and content directory for (case sensitive), default: png, jpeg, jpg')
 
 # Advanced options
@@ -53,7 +54,7 @@ parser.add_argument('--crop',
                     default=0,
                     help='If set to anything else than 0, center crop of this size will be applied to the content image after resizing in order to create a squared image (default: 0)')
 
-# random.seed(131213)
+random.seed(131213)
 
 def input_transform(size, crop):
     transform_list = []
@@ -65,7 +66,7 @@ def input_transform(size, crop):
     transform = torchvision.transforms.Compose(transform_list)
     return transform
 
-def style_transfer(vgg, decoder, content, style, alpha=1.0):
+def style_transfer(vgg, decoder, content, style, alpha):
     assert (0.0 <= alpha <= 1.0)
     content_f = vgg(content)
     style_f = vgg(style)
@@ -75,7 +76,7 @@ def style_transfer(vgg, decoder, content, style, alpha=1.0):
 
 def main():
     args = parser.parse_args()
-
+    
     # set content and style directories
     content_dir = Path(args.content_dir)
     style_dir = Path(args.style_dir)
@@ -93,6 +94,9 @@ def main():
     dataset = []
     for ext in extensions:
         dataset += list(content_dir.rglob('*.' + ext))
+        
+    print(content_dir)
+    print(dataset)
 
     assert len(dataset) > 0, 'No images with specified extensions found in content directory' + content_dir
     content_paths = sorted(dataset)
@@ -135,6 +139,10 @@ def main():
         for content_path in content_paths:
             try:
                 content_img = Image.open(content_path).convert('RGB')
+                h, w = content_img.size
+                print('-----------------------------------------')
+                print('width:  ', w)
+                print('height: ', h)
                 for style_path in random.sample(styles, args.num_styles):
                     style_img = Image.open(style_path).convert('RGB')
 
@@ -146,6 +154,7 @@ def main():
                         output = style_transfer(vgg, decoder, content, style,
                                                 args.alpha)
                     output = output.cpu()
+                    output_np = output.cpu().detach().numpy().copy()
 
                     rel_path = content_path.relative_to(content_dir)
                     out_dir = output_dir.joinpath(rel_path.parent)
@@ -157,12 +166,18 @@ def main():
 
                     content_name = content_path.stem
                     output_name = out_dir.joinpath(content_name + content_path.suffix)
+                    
+                    print(output_np)
+                    output_img = Image.fromarray((output_np * 255).astype(np.uint8))
+                    w, h = output_img.size
+                    print(w)
+                    print(h)
 
                     save_image(output, output_name, padding=0) #default image padding is 2.
                     style_img.close()
                 content_img.close()
             except OSError as e:
-                print('Skipping stylization of %s due to an error' %(content_path))
+                print('Skipping stylization of %s due to an error: {}'.format(content_path, e))
                 skipped_imgs.append(content_path)
                 continue
             except RuntimeError as e:
@@ -178,4 +193,14 @@ def main():
                 f.write("%s\n" % item)
 
 if __name__ == '__main__':
+    # try:
+    #     main()
+    # except Exception as e:
+    #     traceback.print_exc()
+    #     notify_fail(str(e))
+    # else:
+    #     args = parser.parse_args()
+    #     content_dir = Path(args.content_dir)
+    #     notify_message(message='success {}'.format(content_dir))
+
     main()

@@ -4,6 +4,14 @@ import logging
 import datetime
 import pathlib
 
+def notify_message(message: str):
+    token = os.getenv('SLACK_API_TOKEN')
+    channel = os.getenv('CHANNEL')
+    mention_to_me = os.getenv("SLACK_USER_ID")
+
+    client = WebClient(token=token)
+    client.chat_postMessage(channel=channel, text=mention_to_me+message)
+
 def notify_success(filename: str):
     token = os.getenv('SLACK_API_TOKEN')
     channel = os.getenv('CHANNEL')
@@ -13,6 +21,7 @@ def notify_success(filename: str):
     log = f.read()
 
     client = WebClient(token=token)
+    
     client.chat_postMessage(channel=channel, text=mention_to_me+ '\n' +log)
 
     f.close()

@@ -62,8 +62,6 @@ def setup_cfg(args):
 
     cfg = get_cfg()
     
-    cfg.MODEL.DEVICE="cpu"
-    
     add_centernet_config(cfg)
     add_detic_config(cfg)
     cfg.merge_from_file(args.config_file)
@@ -93,13 +91,13 @@ def save_output_image(args, path):
         assert len(args.input) == 1, "Please specify a directory with args.output"
         out_filename = args.output
 
-def get_object_info(input_image, search_word, confidence_threshold):
+def get_object_info(input_image, search_method, search_word, confidence_threshold):
     mp.set_start_method("spawn", force=True)
     
     args = setup_args(
         input_image=input_image,
         output_image='data/detic/out.jpg',
-        search_method='custom',
+        search_method=search_method,
         search_words=search_word,
         confidence_threshold=confidence_threshold,
     ).parse_args()
@@ -128,12 +126,13 @@ def object_detection_rate(search_words: str, predict_object_list: List[str]):
     return cnt / len(search_word_list)
 
 if __name__ == '__main__':
-    search_words = 'person, glasses, tie, ear'
+    search_words = 'sky'
     
     predict_info, labels = get_object_info(
-        input_image='data/detic/person.jpeg',
+        input_image='data/coco/val2017/000000051314.jpg',
+        search_method='lvis',
         search_word=search_words,
-        confidence_threshold=0.01
+        confidence_threshold=0.5
     )
     
     rate = object_detection_rate(search_words, labels)

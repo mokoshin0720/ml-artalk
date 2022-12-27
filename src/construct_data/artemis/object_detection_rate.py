@@ -59,6 +59,7 @@ if __name__ == '__main__':
         print('--------------------------')
         _, predict_labels = get_object_info(
             input_image=image_filename,
+            search_method='custom',
             search_word=object_list,
             confidence_threshold=0.1,
         )

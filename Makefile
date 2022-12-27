@@ -1,5 +1,6 @@
-filename ?=
 env = prod
+contentdir ?=
+outputdir ?=
 ifeq ($(env), local)
 	env=local
 endif
@@ -9,7 +10,10 @@ init:
 	docker-compose -f docker-compose.${env}.yml up -d
 
 run:
-	docker-compose -f docker-compose.${env}.yml exec artalk python -B ${filename}
+	docker-compose -f docker-compose.${env}.yml exec -T artalk python -B ${filename}
+
+stylize:
+	docker-compose -f docker-compose.${env}.yml exec -T artalk python -B ${filename} --content-dir=${contentdir} --output-dir=${outputdir}
 
 nohup:
 	docker-compose -f docker-compose.${env}.yml exec -d artalk python -B ${filename}
@@ -28,6 +32,3 @@ bash:
 
 shell-cmd:
 	docker-compose -f docker-compose.${env}.yml exec bash ${filename}
-
-logs:
-	docker-compose -f docker-compose.${env}.yml logs artalk

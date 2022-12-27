@@ -57,7 +57,7 @@ class VisualizationDemo(object):
             classifier = BUILDIN_CLASSIFIER[args.vocabulary]
 
         num_classes = len(self.metadata.thing_classes)
-        # self.cpu_device = torch.device("cpu")
+        # self.device = torch.device("cpu")
         self.device = torch.device('cuda:0') if torch.cuda.is_available() else torch.device('cpu')
         self.instance_mode = instance_mode
 
