@@ -113,7 +113,7 @@ Run on multiple machines:
         help="Whether to attempt to resume from the checkpoint directory. "
         "See documentation of `DefaultTrainer.resume_or_load()` for what it means.",
     )
-    parser.add_argument("--eval-only", action="store_true", help="perform evaluation only", default=True)
+    parser.add_argument("--eval-only", action="store_true", help="perform evaluation only", default=False)
     parser.add_argument("--num-gpus", type=int, default=4, help="number of gpus *per machine*") # FIXME: 使えるgpuの数を指定
     parser.add_argument("--num-machines", type=int, default=1, help="total number of machines")
     parser.add_argument(

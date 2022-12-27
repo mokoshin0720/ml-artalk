@@ -140,9 +140,6 @@ def main():
             try:
                 content_img = Image.open(content_path).convert('RGB')
                 h, w = content_img.size
-                print('-----------------------------------------')
-                print('width:  ', w)
-                print('height: ', h)
                 for style_path in random.sample(styles, args.num_styles):
                     style_img = Image.open(style_path).convert('RGB')
 
