@@ -18,14 +18,18 @@ from notify.logger import notify_message, notify_fail
 parser = argparse.ArgumentParser(description='This script applies the AdaIN style transfer method to arbitrary datasets.')
 parser.add_argument('--content-dir', 
                     type=str,
-                    help='Directory path to a batch of content images')
+                    help='Directory path to a batch of content images',
+                    default="data/not_found"
+                    )
 parser.add_argument('--style-dir', 
                     type=str,
                     default='data/resized',
                     help='Directory path to a batch of style images')
 parser.add_argument('--output-dir', 
                     type=str, 
-                    help='Directory to save the output images')
+                    help='Directory to save the output images',
+                    default="data/detic"
+                    )
 parser.add_argument('--num-styles', 
                     type=int, 
                     default=1, 

@@ -54,7 +54,7 @@ def init_logger():
     logging.basicConfig(
         filename=filename,
         filemode='w',
-        level=logging.INFO,
+        level=logging.DEBUG,
     )
 
     return filename

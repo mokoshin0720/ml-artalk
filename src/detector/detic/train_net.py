@@ -7,6 +7,8 @@ import torch
 from torch.nn.parallel import DistributedDataParallel
 import time
 import datetime
+import logging
+
 
 from fvcore.common.timer import Timer
 import detector.detectron.detectron2.utils.comm as comm
@@ -50,6 +52,8 @@ from detector.detic.detic.evaluation.oideval import OIDEvaluator
 from detector.detic.detic.evaluation.custom_coco_eval import CustomCOCOEvaluator
 from detector.detic.detic.modeling.utils import reset_cls_test
 
+from notify.logger import notify_success, notify_fail, init_logger
+import traceback
 
 logger = logging.getLogger("detectron2")
 
@@ -144,67 +148,74 @@ def do_train(cfg, model, resume=False):
         scaler = GradScaler()
 
     logger.info("Starting training from iteration {}".format(start_iter))
+    logging.info("Starting training from iteration {}".format(start_iter))
     with EventStorage(start_iter) as storage:
         step_timer = Timer()
         data_timer = Timer()
         start_time = time.perf_counter()
         for data, iteration in zip(data_loader, range(start_iter, max_iter)):
-            print('------------------------------------')
-            print('{}/{}'.format(iteration, max_iter))
-            print('------------------------------------')
-            
-            print(data)
-            print(len(data))
-            
-            data_time = data_timer.seconds()
-            storage.put_scalars(data_time=data_time)
-            step_timer.reset()
-            iteration = iteration + 1
-            storage.step()
-            loss_dict = model(data)
+            try:
+                logger.info('------------------------------------')
+                logger.info('{}/{}'.format(iteration, max_iter))
+                logger.info(len(data))
+                logger.info('------------------------------------')
 
-            losses = sum(
-                loss for k, loss in loss_dict.items())
-            assert torch.isfinite(losses).all(), loss_dict
+                data_time = data_timer.seconds()
+                storage.put_scalars(data_time=data_time)
+                step_timer.reset()
+                iteration = iteration + 1
+                storage.step()
+                loss_dict = model(data)
 
-            loss_dict_reduced = {k: v.item() \
-                for k, v in comm.reduce_dict(loss_dict).items()}
-            losses_reduced = sum(loss for loss in loss_dict_reduced.values())
-            if comm.is_main_process():
-                storage.put_scalars(
-                    total_loss=losses_reduced, **loss_dict_reduced)
+                losses = sum(
+                    loss for k, loss in loss_dict.items())
+                assert torch.isfinite(losses).all(), loss_dict
 
-            optimizer.zero_grad()
-            if cfg.FP16:
-                scaler.scale(losses).backward()
-                scaler.step(optimizer)
-                scaler.update()
-            else:
-                losses.backward()
-                optimizer.step()
+                loss_dict_reduced = {k: v.item() \
+                    for k, v in comm.reduce_dict(loss_dict).items()}
+                losses_reduced = sum(loss for loss in loss_dict_reduced.values())
+                if comm.is_main_process():
+                    storage.put_scalars(
+                        total_loss=losses_reduced, **loss_dict_reduced)
 
-            storage.put_scalar(
-                "lr", optimizer.param_groups[0]["lr"], smoothing_hint=False)
+                optimizer.zero_grad()
+                if cfg.FP16:
+                    scaler.scale(losses).backward()
+                    scaler.step(optimizer)
+                    scaler.update()
+                else:
+                    losses.backward()
+                    optimizer.step()
 
-            step_time = step_timer.seconds()
-            storage.put_scalars(time=step_time)
-            data_timer.reset()
-            scheduler.step()
+                storage.put_scalar(
+                    "lr", optimizer.param_groups[0]["lr"], smoothing_hint=False)
 
-            if (cfg.TEST.EVAL_PERIOD > 0
-                and iteration % cfg.TEST.EVAL_PERIOD == 0
-                and iteration != max_iter):
-                do_test(cfg, model)
-                comm.synchronize()
+                step_time = step_timer.seconds()
+                storage.put_scalars(time=step_time)
+                data_timer.reset()
+                scheduler.step()
 
-            if iteration - start_iter > 5 and \
-                (iteration % 20 == 0 or iteration == max_iter):
-                for writer in writers:
-                    writer.write()
-            periodic_checkpointer.step(iteration)
+                if (cfg.TEST.EVAL_PERIOD > 0
+                    and iteration % cfg.TEST.EVAL_PERIOD == 0
+                    and iteration != max_iter):
+                    do_test(cfg, model)
+                    comm.synchronize()
+
+                if iteration - start_iter > 5 and \
+                    (iteration % 20 == 0 or iteration == max_iter):
+                    for writer in writers:
+                        writer.write()
+                periodic_checkpointer.step(iteration)
+                
+            except Exception:
+                traceback.print_exc()
+                continue
 
         total_time = time.perf_counter() - start_time
         logger.info(
+            "Total training time: {}".format(
+                str(datetime.timedelta(seconds=int(total_time)))))
+        logging.info(
             "Total training time: {}".format(
                 str(datetime.timedelta(seconds=int(total_time)))))
 
@@ -235,6 +246,7 @@ def main(args):
     
     model = build_model(cfg)
     logger.info("Model:\n{}".format(model))
+    logging.info("Model:\n{}".format(model))
     if args.eval_only:
         DetectionCheckpointer(model, save_dir=cfg.OUTPUT_DIR).resume_or_load(
             cfg.MODEL.WEIGHTS, resume=args.resume
@@ -249,37 +261,43 @@ def main(args):
             find_unused_parameters=cfg.FIND_UNUSED_PARAM
         )
         
-        model = model.module # FIXME: 確認する
+        model = model.module
 
     do_train(cfg, model, resume=args.resume)
     return do_test(cfg, model)
 
 
 if __name__ == "__main__":
-    # FIXME: slack通知を導入する
-    args = default_argument_parser()
-    args = args.parse_args()
-    
-    if args.num_machines == 1:
-        args.dist_url = 'tcp://127.0.0.1:{}'.format(
-            torch.randint(11111, 60000, (1,))[0].item())
+    log_filename = init_logger()
+    try:
+        args = default_argument_parser()
+        args = args.parse_args()
+
+        if args.num_machines == 1:
+            args.dist_url = 'tcp://127.0.0.1:{}'.format(
+                torch.randint(11111, 60000, (1,))[0].item())
+        else:
+            if args.dist_url == 'host':
+                args.dist_url = 'tcp://{}:12345'.format(
+                    os.environ['SLURM_JOB_NODELIST'])
+            elif not args.dist_url.startswith('tcp'):
+                tmp = os.popen(
+                        'echo $(scontrol show job {} | grep BatchHost)'.format(
+                            args.dist_url)
+                    ).read()
+                tmp = tmp[tmp.find('=') + 1: -1]
+                args.dist_url = 'tcp://{}:12345'.format(tmp)
+        print("Command Line Args:", args)
+        launch(
+            main,
+            args.num_gpus,
+            num_machines=args.num_machines,
+            machine_rank=args.machine_rank,
+            dist_url=args.dist_url,
+            args=(args,),
+        )
+    except Exception as e:
+        traceback.print_exc()
+        notify_fail(str(e))
     else:
-        if args.dist_url == 'host':
-            args.dist_url = 'tcp://{}:12345'.format(
-                os.environ['SLURM_JOB_NODELIST'])
-        elif not args.dist_url.startswith('tcp'):
-            tmp = os.popen(
-                    'echo $(scontrol show job {} | grep BatchHost)'.format(
-                        args.dist_url)
-                ).read()
-            tmp = tmp[tmp.find('=') + 1: -1]
-            args.dist_url = 'tcp://{}:12345'.format(tmp)
-    print("Command Line Args:", args)
-    launch(
-        main,
-        args.num_gpus,
-        num_machines=args.num_machines,
-        machine_rank=args.machine_rank,
-        dist_url=args.dist_url,
-        args=(args,),
-    )
+        notify_success(log_filename)

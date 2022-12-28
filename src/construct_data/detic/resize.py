@@ -3,6 +3,9 @@ from PIL import Image
 import traceback
 from notify.logger import notify_success, notify_fail, init_logger
 import logging
+from PIL import ImageFile
+
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 def resize_coco():
     raw_dir = "data/coco/train2017-raw/"
@@ -37,6 +40,21 @@ def resize_imagenet():
     raw_dir = "data/imagenet/ImageNet-LVIS-raw/"
     stylized_dir = "data/imagenet/ImageNet-LVIS/"
     resized_dir = "data/imagenet/ImageNet-LVIS-resized/"
+    
+    if not os.path.exists(resized_dir):
+        os.makedirs(resized_dir)
+        os.chmod(resized_dir, 0o777)
+    
+    convert_image = {
+        1: lambda img: img,
+        2: lambda img: img.transpose(Image.FLIP_LEFT_RIGHT),                              # 左右反転
+        3: lambda img: img.transpose(Image.ROTATE_180),                                   # 180度回転
+        4: lambda img: img.transpose(Image.FLIP_TOP_BOTTOM),                              # 上下反転
+        5: lambda img: img.transpose(Image.FLIP_LEFT_RIGHT).transpose(Pillow.ROTATE_90),  # 左右反転＆反時計回りに90度回転
+        6: lambda img: img.transpose(Image.ROTATE_270),                                   # 反時計回りに270度回転
+        7: lambda img: img.transpose(Image.FLIP_LEFT_RIGHT).transpose(Pillow.ROTATE_270), # 左右反転＆反時計回りに270度回転
+        8: lambda img: img.transpose(Image.ROTATE_90),                                    # 反時計回りに90度回転
+    }
 
     n_dirs = os.listdir(raw_dir)
 
@@ -58,9 +76,23 @@ def resize_imagenet():
                 continue
             
             source_img = Image.open(source_file)
-            target_img = Image.open(target_file)
             
-            source_w, source_h = source_img.size
+            exif = source_img._getexif()
+            if exif is not None:
+                orientation = exif.get(0x112, 1)
+                if orientation == 6:
+                    target_img = Image.open(target_file).rotate(270)
+                    source_h, source_w = source_img.size
+                elif orientation == 8:
+                    target_img = Image.open(target_file).rotate(90)
+                    source_h, source_w = source_img.size
+                else:
+                    target_img = Image.open(target_file)
+                    source_w, source_h = source_img.size
+            else:
+                target_img = Image.open(target_file)
+                source_w, source_h = source_img.size
+                
             target_w, target_h = target_img.size
             
             if source_w != target_w or source_h != target_h:
@@ -153,9 +185,9 @@ def resize_oid():
 if __name__ == '__main__':
     log_filename = init_logger()
     try:
-        # resize_imagenet()
+        resize_imagenet()
         # resize_objects365()
-        resize_oid()
+        # resize_oid()
     except Exception as e:
         traceback.print_exc()
         notify_fail(str(e))
