@@ -19,7 +19,7 @@ parser = argparse.ArgumentParser(description='This script applies the AdaIN styl
 parser.add_argument('--content-dir', 
                     type=str,
                     help='Directory path to a batch of content images',
-                    default="data/not_found"
+                    default="data/tmp"
                     )
 parser.add_argument('--style-dir', 
                     type=str,
@@ -28,7 +28,7 @@ parser.add_argument('--style-dir',
 parser.add_argument('--output-dir', 
                     type=str, 
                     help='Directory to save the output images',
-                    default="data/detic"
+                    default="data/tmp/stylized"
                     )
 parser.add_argument('--num-styles', 
                     type=int, 
@@ -143,7 +143,6 @@ def main():
         for content_path in content_paths:
             try:
                 content_img = Image.open(content_path).convert('RGB')
-                h, w = content_img.size
                 for style_path in random.sample(styles, args.num_styles):
                     style_img = Image.open(style_path).convert('RGB')
 
@@ -155,7 +154,6 @@ def main():
                         output = style_transfer(vgg, decoder, content, style,
                                                 args.alpha)
                     output = output.cpu()
-                    output_np = output.cpu().detach().numpy().copy()
 
                     rel_path = content_path.relative_to(content_dir)
                     out_dir = output_dir.joinpath(rel_path.parent)
@@ -166,15 +164,7 @@ def main():
                         os.chmod(out_dir, 0o777)
 
                     content_name = content_path.stem
-                    output_name = out_dir.joinpath(content_name + content_path.suffix)
                     
-                    print(output_np)
-                    output_img = Image.fromarray((output_np * 255).astype(np.uint8))
-                    w, h = output_img.size
-                    print(w)
-                    print(h)
-
-                    save_image(output, output_name, padding=0) #default image padding is 2.
                     style_img.close()
                 content_img.close()
             except OSError as e:

@@ -73,7 +73,8 @@ def setup_cfg(args):
     cfg.MODEL.PANOPTIC_FPN.COMBINE.INSTANCES_CONFIDENCE_THRESH = args.confidence_threshold
     cfg.MODEL.ROI_BOX_HEAD.ZEROSHOT_WEIGHT_PATH = 'rand' # load later
     
-    model_weights = 'models/detic/Detic_LCOCOI21k_CLIP_SwinB_896b32_4x_ft4x_max-size.pth'
+    # model_weights = 'models/detic/Detic_LCOCOI21k_CLIP_SwinB_896b32_4x_ft4x_max-size.pth'
+    model_weights = 'data/Detic/Detic_LCOCOI21k_CLIP_SwinB_896b32_4x_ft4x_max-size/model_9000.pth'
     cfg.MODEL.WEIGHTS = model_weights
     
     if not args.pred_all_class:
@@ -96,7 +97,7 @@ def get_object_info(input_image, search_method, search_word, confidence_threshol
     
     args = setup_args(
         input_image=input_image,
-        output_image='data/detic/out.jpg',
+        output_image='data/tmp/9000_out.jpg',
         search_method=search_method,
         search_words=search_word,
         confidence_threshold=confidence_threshold,
@@ -129,7 +130,7 @@ if __name__ == '__main__':
     search_words = 'sky'
     
     predict_info, labels = get_object_info(
-        input_image='data/coco/val2017/000000051314.jpg',
+        input_image='data/tmp/stylized/desk.jpg',
         search_method='lvis',
         search_word=search_words,
         confidence_threshold=0.5

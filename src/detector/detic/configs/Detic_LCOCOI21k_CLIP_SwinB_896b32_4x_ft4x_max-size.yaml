@@ -1,7 +1,7 @@
 _BASE_: "Base-C2_L_R5021k_640b64_4x.yaml"
 MODEL:
-  WEIGHTS: "models/detic/BoxSup-C2_LCOCO_CLIP_SwinB_896b32_4x.pth"
-  # WEIGHTS: "output/Detic/Detic_LCOCOI21k_CLIP_SwinB_896b32_4x_ft4x_max-size/model_final.pth" # FIXME: 学習後モデル
+  # WEIGHTS: "models/detic/BoxSup-C2_LCOCO_CLIP_SwinB_896b32_4x.pth"
+  WEIGHTS: "data/Detic/Detic_LCOCOI21k_CLIP_SwinB_896b32_4x_ft4x_max-size/model_9000.pth"
   DYNAMIC_CLASSIFIER: True
   ROI_BOX_HEAD:
     USE_ZEROSHOT_CLS: True
@@ -22,7 +22,7 @@ MODEL:
   TEST_NUM_CLASSES: [500, 365]
 SOLVER:
   # MAX_ITER: 180000
-  MAX_ITER: 18000
+  MAX_ITER: 9000
   IMS_PER_BATCH: 32 # GPUの数で割り切れる必要がある
   BASE_LR: 0.0001
   # WARMUP_ITERS: 1000
