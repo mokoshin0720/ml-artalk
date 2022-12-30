@@ -9,10 +9,14 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 def resize_coco():
     raw_dir = "data/coco/train2017-raw/"
-    stylized_dir = "data/coco/train2017/"
+    stylized_dir = "data/coco/train2017-stylized/"
     resized_dir = "data/coco/train2017-resized/"
+    
+    if not os.path.exists(resized_dir):
+        os.makedirs(resized_dir)
+        os.chmod(resized_dir, 0o777)
 
-    image_files = os.listdir(raw_dir)    
+    image_files = os.listdir(raw_dir)
     for file_name in image_files:
         source_file = raw_dir + file_name
         target_file = stylized_dir + file_name
@@ -32,13 +36,16 @@ def resize_coco():
                 target_resize = target_img.resize((source_w, source_h), Image.LANCZOS)
                 target_resize.save(resized_dir + file_name)
             else:
+                print('-------------------')
+                print('same')
+                print('-------------------')
                 target_img.save(resized_dir + file_name)
             source_img.close()
             target_img.close()
             
 def resize_imagenet():
     raw_dir = "data/imagenet/ImageNet-LVIS-raw/"
-    stylized_dir = "data/imagenet/ImageNet-LVIS/"
+    stylized_dir = "data/imagenet/ImageNet-LVIS-stylized/"
     resized_dir = "data/imagenet/ImageNet-LVIS-resized/"
     
     if not os.path.exists(resized_dir):
@@ -186,8 +193,6 @@ if __name__ == '__main__':
     log_filename = init_logger()
     try:
         resize_imagenet()
-        # resize_objects365()
-        # resize_oid()
     except Exception as e:
         traceback.print_exc()
         notify_fail(str(e))

@@ -13,13 +13,13 @@ from tqdm import tqdm
 import numpy as np
 import os
 import traceback
+import random
 from notify.logger import notify_message, notify_fail
 
 parser = argparse.ArgumentParser(description='This script applies the AdaIN style transfer method to arbitrary datasets.')
 parser.add_argument('--content-dir', 
                     type=str,
                     help='Directory path to a batch of content images',
-                    default="data/tmp"
                     )
 parser.add_argument('--style-dir', 
                     type=str,
@@ -28,7 +28,6 @@ parser.add_argument('--style-dir',
 parser.add_argument('--output-dir', 
                     type=str, 
                     help='Directory to save the output images',
-                    default="data/tmp/stylized"
                     )
 parser.add_argument('--num-styles', 
                     type=int, 
@@ -71,6 +70,7 @@ def input_transform(size, crop):
     return transform
 
 def style_transfer(vgg, decoder, content, style, alpha):
+    alpha = random.random()
     assert (0.0 <= alpha <= 1.0)
     content_f = vgg(content)
     style_f = vgg(style)
@@ -78,7 +78,7 @@ def style_transfer(vgg, decoder, content, style, alpha):
     feat = feat * alpha + content_f * (1 - alpha)
     return decoder(feat)
 
-def main():
+def main(device):
     args = parser.parse_args()
     
     # set content and style directories
@@ -94,6 +94,11 @@ def main():
     assert len(extensions) > 0, 'No file extensions specified'
     content_dir = Path(content_dir)
     content_dir = content_dir.resolve()
+    
+    print('--------------------------------')
+    print(content_dir)
+    print('--------------------------------')
+    
     assert content_dir.is_dir(), 'Content directory not found'
     dataset = []
     for ext in extensions:
@@ -117,8 +122,6 @@ def main():
 
     decoder = net.decoder
     vgg = net.vgg
-
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     decoder.eval()
     vgg.eval()
@@ -157,13 +160,17 @@ def main():
 
                     rel_path = content_path.relative_to(content_dir)
                     out_dir = output_dir.joinpath(rel_path.parent)
-
-                    # create directory structure if it does not exist
+                    
                     if not out_dir.is_dir():
                         out_dir.mkdir(parents=True)
                         os.chmod(out_dir, 0o777)
 
                     content_name = content_path.stem
+                    out_filename = content_name + content_path.suffix
+                    output_name = out_dir.joinpath(out_filename)
+
+                    save_image(output, output_name, padding=0)
+
                     
                     style_img.close()
                 content_img.close()
@@ -185,7 +192,8 @@ def main():
 
 if __name__ == '__main__':
     # try:
-    #     main()
+    #     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    #     main(device)
     # except Exception as e:
     #     traceback.print_exc()
     #     notify_fail(str(e))
@@ -193,5 +201,6 @@ if __name__ == '__main__':
     #     args = parser.parse_args()
     #     content_dir = Path(args.content_dir)
     #     notify_message(message='success {}'.format(content_dir))
-
-    main()
+    
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    main(device)

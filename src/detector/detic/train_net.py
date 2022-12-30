@@ -55,6 +55,9 @@ from detector.detic.detic.modeling.utils import reset_cls_test
 from notify.logger import notify_success, notify_fail, init_logger
 import traceback
 
+from PIL import ImageFile 
+ImageFile.LOAD_TRUNCATED_IMAGES = True
+
 logger = logging.getLogger("detectron2")
 
 def do_test(cfg, model):
