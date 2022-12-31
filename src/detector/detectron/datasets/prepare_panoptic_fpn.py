@@ -62,13 +62,17 @@ def separate_coco_semantic_from_panoptic(panoptic_json, panoptic_root, sem_seg_r
     def iter_annotations():
         for anno in obj["annotations"]:
             file_name = anno["file_name"]
+            file_name = file_name.replace('png', 'jpg') # ADD FROM ME
+            
             segments = anno["segments_info"]
             input = os.path.join(panoptic_root, file_name)
             output = os.path.join(sem_seg_root, file_name)
             yield input, output, segments
-
+            
+    panoptic_root = 'data/coco/train2017-raw'
     print("Start writing to {} ...".format(sem_seg_root))
     start = time.time()
+    
     pool.starmap(
         functools.partial(_process_panoptic_to_semantic, id_map=id_map),
         iter_annotations(),
@@ -78,8 +82,9 @@ def separate_coco_semantic_from_panoptic(panoptic_json, panoptic_root, sem_seg_r
 
 
 if __name__ == "__main__":
-    dataset_dir = os.path.join(os.getenv("DETECTRON2_DATASETS", "datasets"), "coco")
-    for s in ["val2017", "train2017"]:
+    # dataset_dir = os.path.join(os.getenv("DETECTRON2_DATASETS", "datasets"), "coco")
+    dataset_dir = os.path.join(os.getenv("DETECTRON2_DATASETS", "data"), "coco")
+    for s in ["train2017"]:
         separate_coco_semantic_from_panoptic(
             os.path.join(dataset_dir, "annotations/panoptic_{}.json".format(s)),
             os.path.join(dataset_dir, "panoptic_{}".format(s)),

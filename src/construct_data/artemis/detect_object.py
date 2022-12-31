@@ -6,8 +6,14 @@ from detector.detic.third_party.CenterNet2.centernet.config import add_centernet
 from detector.detic.detic.config import add_detic_config
 from detector.detic.detic.predictor import VisualizationDemo
 from detector.detectron.detectron2.data.detection_utils import read_image
+from detector.detectron.detectron2 import model_zoo
+from detector.detectron.detectron2.engine import DefaultPredictor
+from detector.detectron.detectron2.data import MetadataCatalog
+from detector.detectron.detectron2.utils.visualizer import Visualizer
 import argparse
 from typing import List
+import cv2
+import pprint
 
 def setup_args(input_image, output_image, search_method, search_words, confidence_threshold):
     parser = argparse.ArgumentParser(description="Detectron2 demo for builtin configs")
@@ -59,7 +65,6 @@ def setup_args(input_image, output_image, search_method, search_words, confidenc
     return parser
 
 def setup_cfg(args):
-
     cfg = get_cfg()
     
     add_centernet_config(cfg)
@@ -74,7 +79,7 @@ def setup_cfg(args):
     cfg.MODEL.ROI_BOX_HEAD.ZEROSHOT_WEIGHT_PATH = 'rand' # load later
     
     # model_weights = 'models/detic/Detic_LCOCOI21k_CLIP_SwinB_896b32_4x_ft4x_max-size.pth'
-    model_weights = 'data/Detic/Detic_LCOCOI21k_CLIP_SwinB_896b32_4x_ft4x_max-size/model_9000.pth'
+    model_weights = 'data/Detic/Detic_LCOCOI21k_CLIP_SwinB_896b32_4x_ft4x_max-size/model_18000.pth'
     cfg.MODEL.WEIGHTS = model_weights
     
     if not args.pred_all_class:
@@ -115,7 +120,24 @@ def get_object_info(input_image, search_method, search_word, confidence_threshol
     out_filename = args.output
     visualized_output.save(out_filename)
     
-    return predict_info, labels
+    return predict_info['instances'].pred_masks, labels
+
+def get_panoptic_info(input_image):
+    cfg = get_cfg()
+    cfg.merge_from_file(model_zoo.get_config_file("COCO-PanopticSegmentation/panoptic_fpn_R_101_3x.yaml"))
+    cfg.MODEL.PANOPTIC_FPN.COMBINE.INSTANCES_CONFIDENCE_THRESH = 0.5
+    cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-PanopticSegmentation/panoptic_fpn_R_101_3x.yaml")
+    predictor = DefaultPredictor(cfg)
+    
+    im = cv2.imread(input_image)
+    panoptic_seg, segments_info = predictor(im)["panoptic_seg"]
+    
+    v = Visualizer(im[:, :, ::-1], MetadataCatalog.get(cfg.DATASETS.TRAIN[0]), scale=1.2)
+    v, labels, masks = v.draw_panoptic_seg_predictions(panoptic_seg.to("cpu"), segments_info)
+    
+    cv2.imwrite('data/tmp/panoptic_out.jpg', v.get_image()[:, :, ::-1])
+    
+    return masks, labels
 
 def object_detection_rate(search_words: str, predict_object_list: List[str]):
     search_word_list = search_words.split(',')
@@ -126,15 +148,43 @@ def object_detection_rate(search_words: str, predict_object_list: List[str]):
         
     return cnt / len(search_word_list)
 
-if __name__ == '__main__':
-    search_words = 'sky'
+def object_detection_rate(
+    search_words,
+    detic_object_words,
+    detic_object_masks,
+    panoptic_object_words,
+    panoptic_object_masks,
+):
+    search_word_list = search_words.split(',')
+    cnt = 0
+    for w in search_word_list:
+        if w in detic_object_words or w in panoptic_object_words: cnt += 1
     
-    predict_info, labels = get_object_info(
-        input_image='data/tmp/stylized/desk.jpg',
-        search_method='lvis',
+    return cnt / len(search_word_list)
+
+if __name__ == '__main__':
+    input_image = 'data/tmp/stylized/desk.jpg'
+    input_image = 'data/wikiart/Post_Impressionism/vincent-van-gogh_portrait-of-madame-ginoux-l-arlesienne-1890.jpg'
+    # input_image = 'data/wikiart/Expressionism/wassily-kandinsky_study-for-autumn-1909.jpg'
+    search_words = 'woman,rose,lip,woman,guy,someone,sun,glow,water,painting,mother,Mary,baby,Jesus,onlooker,creature,painting'
+    
+    panoptic_labels, masks = get_panoptic_info(input_image=input_image)
+    
+    print(panoptic_labels)
+    print('----------------------------')
+    print(masks)
+    print('*********************************')
+    
+    detic_masks, detic_labels = get_object_info(
+        input_image=input_image,
+        search_method='custom',
         search_word=search_words,
-        confidence_threshold=0.5
+        confidence_threshold=0.1
     )
     
-    rate = object_detection_rate(search_words, labels)
+    print(detic_masks)
+    print('----------------------------')
+    print(detic_labels)
+    
+    rate = object_detection_rate(search_words, detic_labels)
     print(rate)

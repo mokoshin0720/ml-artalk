@@ -244,6 +244,9 @@ def _create_text_labels(classes, scores, class_names, is_crowd=None):
             labels = [class_names[i] for i in classes]
         else:
             labels = [str(i) for i in classes]
+    
+    scores = None
+    
     if scores is not None:
         if labels is None:
             labels = ["{:.0f}%".format(s * 100) for s in scores]
@@ -498,6 +501,8 @@ class Visualizer:
             self.output.reset_image(self._create_grayscale_image(pred.non_empty_mask()))
 
         # draw mask for all semantic segments first i.e. "stuff"
+        text_list = []
+        mask_pos_list = []
         for mask, sinfo in pred.semantic_masks():
             category_idx = sinfo["category_id"]
             try:
@@ -506,6 +511,10 @@ class Visualizer:
                 mask_color = None
 
             text = self.metadata.stuff_classes[category_idx]
+            
+            text_list.append(text)
+            mask_pos_list.append(mask)
+            
             self.draw_binary_mask(
                 mask,
                 color=mask_color,
@@ -529,7 +538,10 @@ class Visualizer:
         labels = _create_text_labels(
             category_ids, scores, self.metadata.thing_classes, [x.get("iscrowd", 0) for x in sinfo]
         )
-
+        
+        for label in labels:
+            text_list.append(label)
+        
         try:
             colors = [
                 self._jitter([x / 255 for x in self.metadata.thing_colors[c]]) for c in category_ids
@@ -537,8 +549,11 @@ class Visualizer:
         except AttributeError:
             colors = None
         self.overlay_instances(masks=masks, labels=labels, assigned_colors=colors, alpha=alpha)
+        
+        for mask in masks:
+            mask_pos_list.append(mask)
 
-        return self.output
+        return self.output, text_list, mask_pos_list
 
     draw_panoptic_seg_predictions = draw_panoptic_seg  # backward compatibility
 

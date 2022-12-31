@@ -137,8 +137,11 @@ def get_config_file(config_path):
         str: the real path to the config file.
     """
     cfg_file = pkg_resources.resource_filename(
-        "detectron2.model_zoo", os.path.join("configs", config_path)
+        "detector.detectron.detectron2.model_zoo", os.path.join("configs", config_path)
     )
+    # cfg_file = pkg_resources.resource_filename(
+    #     "detectron2.model_zoo", os.path.join("configs", config_path)
+    # )
 
     cfg_file = 'src/detector/detectron/configs/COCO-PanopticSegmentation/panoptic_fpn_R_101_3x.yaml'
     

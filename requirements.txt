@@ -43,3 +43,5 @@ mss
 ftfy
 lvis
 tensorboard
+
+git+https://github.com/cocodataset/panopticapi.git
