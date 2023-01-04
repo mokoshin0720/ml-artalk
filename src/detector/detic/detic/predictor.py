@@ -58,7 +58,12 @@ class VisualizationDemo(object):
 
         num_classes = len(self.metadata.thing_classes)
         # self.device = torch.device("cpu")
-        self.device = torch.device('cuda:0') if torch.cuda.is_available() else torch.device('cpu')
+        self.device = torch.device(cfg.MODEL.DEVICE)
+        
+        print('--------------------')
+        print(self.device)
+        print('--------------------')
+        
         self.instance_mode = instance_mode
 
         self.parallel = parallel

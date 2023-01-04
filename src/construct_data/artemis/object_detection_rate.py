@@ -3,6 +3,7 @@ from construct_data.artemis.detect_object import get_object_info, object_detecti
 import matplotlib.pyplot as plt
 from notify.logger import notify_success, notify_fail, init_logger
 import traceback
+import torch
 
 def get_panoptic_dict(
     object_list,
@@ -30,7 +31,7 @@ def get_detic_dict(
             
     return result
 
-def launch():
+def launch(train_or_test):
     ratio_dict_by_style = {
         'Abstract_Expressionism': [],
         'Action_painting': [],
@@ -61,13 +62,14 @@ def launch():
         'Ukiyo_e': [],
     }
     
-    origin_df = pd.read_csv('data/artemis_test_dataset.csv')
-    idx2object_df = pd.read_csv('data/idx2object_test.csv', header=0)
+    origin_df = pd.read_csv('data/artemis_{}_dataset.csv'.format(train_or_test))
+    idx2object_df = pd.read_csv('data/idx2object_{}.csv'.format(train_or_test), header=0)
     
     checked_filenames = []
-    new_csv_list = [] # 最終的に欲しいもの [[sentence_id, object, mask]]
     
-    for _, row in idx2object_df.iterrows():
+    for idx, row in idx2object_df.iterrows():
+        new_csv_dict = {} # {sentence_id : [[object, mask], [object, mask]]}
+        print("{}/{}[{}%] start".format(idx, len(idx2object_df), idx/len(idx2object_df)), flush=True)
         sentence_id = row['sentence_id']
         art_style = origin_df.at[sentence_id, "art_style"]
         painting = origin_df.at[sentence_id, "painting"]
@@ -77,6 +79,7 @@ def launch():
         checked_filenames.append(image_filename)
         
         sentence_ids = origin_df[(origin_df['art_style'] == art_style) & (origin_df['painting'] == painting)].index
+        
         object_list = idx2object_df[idx2object_df['sentence_id'].isin(sentence_ids)]['object'].tolist()
         
         object_dict = {} # {'word1': idx1, 'word2': idx2}
@@ -99,7 +102,7 @@ def launch():
             input_image=image_filename,
             search_method='custom',
             search_word=search_words,
-            confidence_threshold=0.1,
+            confidence_threshold=0.05,
         )
         
         rate = object_detection_rate(
@@ -125,8 +128,12 @@ def launch():
             if obj in object_dict:
                 sentence_id = object_dict[obj]
                 mask = str(mask.tolist())
-                row = [sentence_id, obj, mask]
-                new_csv_list.append(row)
+                row = [obj, mask]
+                
+                if sentence_id in new_csv_dict.keys():
+                    new_csv_dict[sentence_id].append(row)
+                else:
+                    new_csv_dict[sentence_id] = [row]
             else:
                 continue
             
@@ -135,13 +142,22 @@ def launch():
                 mask = str(mask.tolist())
                 sentence_id = object_dict[obj]
                 row = [sentence_id, obj, mask]
-                new_csv_list.append(row)
+                row = [obj, mask]
+                
+                if sentence_id in new_csv_dict.keys():
+                    new_csv_dict[sentence_id].append(row)
+                else:
+                    new_csv_dict[sentence_id] = [row]
             else:
                 continue
+            
+        for k, v in new_csv_dict.items():
+            mask_df = pd.DataFrame(v, columns =['object', 'mask'])
+            mask_df.to_csv('data/object2mask/{}/{}.csv'.format(train_or_test, k), index=False)
         
-    mask_df = pd.DataFrame(new_csv_list,columns =['sentence_id', 'object', 'mask'])
-    mask_df.to_csv('data/object2mask_test.csv', index=False)
-    
+        torch.cuda.empty_cache()
+        print('===================================', flush=True)
+            
     x_pos = [i for i in range(len(ratio_dict_by_style))]
     labels = [k for k, _ in ratio_dict_by_style.items()]
     ratios = []
@@ -151,18 +167,22 @@ def launch():
             ratios.append(ratio)
         except ZeroDivisionError:
             ratios.append(0)
+    
+    print(x_pos)
+    print(ratios)
+    
     plt.rcParams['font.family'] = 'Noto Sans JP'
     plt.figure(figsize = (10, 10))
     plt.bar(x_pos, ratios, tick_label=labels, align='center')
     plt.xticks(rotation=90)
     plt.title('絵画スタイルごとの検出率')
     plt.tight_layout()
-    plt.savefig('detection_rate.png')
+    plt.savefig('detection_rate_{}.png'.format(train_or_test))
 
 if __name__ == '__main__':
     log_filename = init_logger()
     try:
-        launch()
+        launch('test')
     except Exception as e:
         traceback.print_exc()
         notify_fail(str(e))

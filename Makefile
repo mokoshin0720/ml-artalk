@@ -19,7 +19,7 @@ run-detach:
 	docker-compose -f docker-compose.${env}.yml exec -T --detach artalk python -B ${filename}
 
 nohup:
-	nohup docker-compose -f docker-compose.${env}.yml exec -T artalk python -B ${filename} &
+	nohup docker-compose -f docker-compose.${env}.yml exec -T artalk python -B ${filename} > ${outname} &
 
 down:
 	docker-compose -f docker-compose.${env}.yml down
