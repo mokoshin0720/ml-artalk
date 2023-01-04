@@ -14,6 +14,7 @@ import argparse
 from typing import List
 import cv2
 import pprint
+import gc
 
 def setup_args(input_image, output_image, search_method, search_words, confidence_threshold):
     parser = argparse.ArgumentParser(description="Detectron2 demo for builtin configs")
@@ -120,6 +121,9 @@ def get_object_info(input_image, search_method, search_word, confidence_threshol
     out_filename = args.output
     visualized_output.save(out_filename)
     
+    del demo
+    gc.collect()
+    
     return predict_info['instances'].pred_masks, labels
 
 def get_panoptic_info(input_image):
@@ -137,6 +141,9 @@ def get_panoptic_info(input_image):
     
     cv2.imwrite('data/tmp/panoptic_out.jpg', v.get_image()[:, :, ::-1])
     
+    del predictor
+    gc.collect()
+    
     return masks, labels
 
 def object_detection_rate(search_words: str, predict_object_list: List[str]):
@@ -151,9 +158,7 @@ def object_detection_rate(search_words: str, predict_object_list: List[str]):
 def object_detection_rate(
     search_words,
     detic_object_words,
-    detic_object_masks,
     panoptic_object_words,
-    panoptic_object_masks,
 ):
     search_word_list = search_words.split(',')
     cnt = 0
