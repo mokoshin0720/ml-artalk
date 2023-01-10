@@ -8,3 +8,4 @@ wandb/
 train2017.zip
 winter21_whole.tar.gz
 output/
+*.out

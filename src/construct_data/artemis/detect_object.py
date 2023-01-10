@@ -86,7 +86,7 @@ def setup_cfg(args):
     if not args.pred_all_class:
         cfg.MODEL.ROI_HEADS.ONE_CLASS_PER_PROPOSAL = True
     
-    cfg.MODEL.DEVICE = 'cuda:2'
+    cfg.MODEL.DEVICE = 'cuda:3'
 
     cfg.freeze()
     
@@ -133,7 +133,7 @@ def get_panoptic_info(input_image):
     cfg.merge_from_file(model_zoo.get_config_file("COCO-PanopticSegmentation/panoptic_fpn_R_101_3x.yaml"))
     cfg.MODEL.PANOPTIC_FPN.COMBINE.INSTANCES_CONFIDENCE_THRESH = 0.5
     cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-PanopticSegmentation/panoptic_fpn_R_101_3x.yaml")
-    cfg.MODEL.DEVICE = 'cuda:2'
+    cfg.MODEL.DEVICE = 'cuda:3'
     
     predictor = DefaultPredictor(cfg)
     

@@ -1,5 +1,5 @@
 import pandas as pd
-from experiment.train.utils import detector.detic.third_party.CLIP.clip_gradient
+from experiment.train.utils import clip_gradient
 import pickle
 from experiment.utils.vocab import Vocabulary
 
@@ -11,7 +11,10 @@ def get_conf():
     
     train_csv = 'data/artemis_train_dataset.csv'
     test_csv = 'data/artemis_test_dataset.csv'
-    idx2obj_csv = 'data/idx2object.csv'
+    train_object_txt_dir = 'data/image_info/train/object'
+    test_object_txt_dir = 'data/image_info/test/object'
+    train_mask_txt_dir = 'data/image_info/train/mask'
+    test_mask_txt_dir = 'data/image_info/test/mask'
     
     cnn_lstm = 'cnn_lstm'
     cnn_lstm_with_object = 'cnn_lstm_with_object'
@@ -27,7 +30,7 @@ def get_conf():
         show_attend_tell_with_object,
     ]
     
-    use_model = show_attend_tell
+    use_model = show_attend_tell_with_object
 
     with open('data/vocab.pkl', 'rb') as f:
         vocab = pickle.load(f)
@@ -45,7 +48,10 @@ def get_conf():
         'vocab': vocab,
         'train_df': pd.read_csv(train_csv),
         'test_df': pd.read_csv(test_csv),
-        'idx2obj_df': pd.read_csv(idx2obj_csv),
+        'train_object_txt_dir': train_object_txt_dir,
+        'test_object_txt_dir': test_object_txt_dir,
+        'train_mask_txt_dir': train_mask_txt_dir,
+        'test_mask_txt_dir': test_mask_txt_dir,
         'shuffle': True,
 
         # step

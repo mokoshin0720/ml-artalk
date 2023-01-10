@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 from notify.logger import notify_success, notify_fail, init_logger
 import traceback
 import torch
+import pathlib
+import os
 
 def get_panoptic_dict(
     object_list,
@@ -30,6 +32,21 @@ def get_detic_dict(
             result[obj] = detic_masks[idx]
             
     return result
+
+def is_exist_csv(sentence_ids):
+    CSV_DATA = 'data/object2mask/train/'
+    for id in sentence_ids:
+        if os.path.isfile(CSV_DATA + str(id) + '.csv'): return True
+    return False
+
+def is_exist_filename(filename):
+    target_dir = 'data/object2mask/checked/' + str(filename)
+    if os.path.isfile(target_dir): return True
+    
+    make_path = pathlib.Path(target_dir)
+    make_path.touch()
+    
+    return False
 
 def launch(train_or_test):
     ratio_dict_by_style = {
@@ -64,21 +81,23 @@ def launch(train_or_test):
     
     origin_df = pd.read_csv('data/artemis_{}_dataset.csv'.format(train_or_test))
     idx2object_df = pd.read_csv('data/idx2object_{}.csv'.format(train_or_test), header=0)
+    total_df_len = len(idx2object_df)
     
-    checked_filenames = []
+    start_point = 9.5
+    idx2object_df = idx2object_df[int(len(idx2object_df)/10*start_point):int(len(idx2object_df)/10*(start_point+1))]
     
     for idx, row in idx2object_df.iterrows():
         new_csv_dict = {} # {sentence_id : [[object, mask], [object, mask]]}
-        print("{}/{}[{}%] start".format(idx, len(idx2object_df), idx/len(idx2object_df)), flush=True)
+        print("{}/{}[{}%] start".format(idx, total_df_len, idx/total_df_len*100), flush=True)
         sentence_id = row['sentence_id']
         art_style = origin_df.at[sentence_id, "art_style"]
         painting = origin_df.at[sentence_id, "painting"]
         image_filename = 'data/wikiart/{}/{}.jpg'.format(art_style, painting)
         
-        if image_filename in checked_filenames: continue
-        checked_filenames.append(image_filename)
+        if is_exist_filename(art_style+painting): continue
         
         sentence_ids = origin_df[(origin_df['art_style'] == art_style) & (origin_df['painting'] == painting)].index
+        if is_exist_csv(sentence_ids): continue
         
         object_list = idx2object_df[idx2object_df['sentence_id'].isin(sentence_ids)]['object'].tolist()
         
@@ -96,17 +115,20 @@ def launch(train_or_test):
         
         search_words = ""
         for obj in object_list:
-            if obj not in panoptic_labels: search_words = search_words + obj + ','
+            if obj not in panoptic_labels: search_words = search_words + str(obj) + ','
         
-        detic_masks, detic_labels = get_object_info(
-            input_image=image_filename,
-            search_method='custom',
-            search_word=search_words,
-            confidence_threshold=0.05,
-        )
+        try:
+            detic_masks, detic_labels = get_object_info(
+                input_image=image_filename,
+                search_method='custom',
+                search_word=search_words,
+                confidence_threshold=0.05,
+            )
+        except Exception as e:
+            detic_masks, detic_labels = [], []
         
         rate = object_detection_rate(
-            search_words=','.join(object_list), 
+            search_words=','.join(map(str,object_list)), 
             detic_object_words=detic_labels,
             panoptic_object_words=panoptic_labels,
         )
@@ -158,31 +180,31 @@ def launch(train_or_test):
         torch.cuda.empty_cache()
         print('===================================', flush=True)
             
-    x_pos = [i for i in range(len(ratio_dict_by_style))]
-    labels = [k for k, _ in ratio_dict_by_style.items()]
-    ratios = []
-    for _, v in ratio_dict_by_style.items():
-        try:
-            ratio = sum(v)/len(v)
-            ratios.append(ratio)
-        except ZeroDivisionError:
-            ratios.append(0)
+    # x_pos = [i for i in range(len(ratio_dict_by_style))]
+    # labels = [k for k, _ in ratio_dict_by_style.items()]
+    # ratios = []
+    # for _, v in ratio_dict_by_style.items():
+    #     try:
+    #         ratio = sum(v)/len(v)
+    #         ratios.append(ratio)
+    #     except ZeroDivisionError:
+    #         ratios.append(0)
     
-    print(x_pos)
-    print(ratios)
+    # print(x_pos)
+    # print(ratios)
     
-    plt.rcParams['font.family'] = 'Noto Sans JP'
-    plt.figure(figsize = (10, 10))
-    plt.bar(x_pos, ratios, tick_label=labels, align='center')
-    plt.xticks(rotation=90)
-    plt.title('絵画スタイルごとの検出率')
-    plt.tight_layout()
-    plt.savefig('detection_rate_{}.png'.format(train_or_test))
+    # plt.rcParams['font.family'] = 'Noto Sans JP'
+    # plt.figure(figsize = (10, 10))
+    # plt.bar(x_pos, ratios, tick_label=labels, align='center')
+    # plt.xticks(rotation=90)
+    # plt.title('絵画スタイルごとの検出率')
+    # plt.tight_layout()
+    # plt.savefig('detection_rate_{}.png'.format(train_or_test))
 
 if __name__ == '__main__':
     log_filename = init_logger()
     try:
-        launch('test')
+        launch('train')
     except Exception as e:
         traceback.print_exc()
         notify_fail(str(e))
