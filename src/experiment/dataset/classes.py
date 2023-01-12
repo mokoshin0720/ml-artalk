@@ -51,8 +51,11 @@ class WikiartDatasetWithObject(data.Dataset):
     def __getitem__(self, index):
         vocab = self.vocab
         wikiart_df = self.wikiart_df
-        object_txt = self.object_dir + '/' + str(index) + '.txt'
-        mask_txt = self.mask_dir + '/' + str(index) + '.txt'
+        
+        # TODO: ☟indexじゃなくて、idである必要がある
+        id = wikiart_df.at[index, 'id']
+        object_txt = self.object_dir + '/' + str(id) + '.txt'
+        mask_txt = self.mask_dir + '/' + str(id) + '.txt'
 
         filename = wikiart_df.at[index, 'painting'] + '.jpg'
         caption = wikiart_df.at[index, 'utterance']
@@ -61,26 +64,14 @@ class WikiartDatasetWithObject(data.Dataset):
         if self.transform is not None:
             image = self.transform(image)
             
-        if os.path.isfile(object_txt):
-            with open(object_txt, 'r') as f:
-                obj_str = f.read()
-                noun_list = eval(obj_str)
-                f.close()
-            
-            with open(mask_txt, 'r') as f:
-                print('画像加工処理を加える', flush=True)
-                mask_str = f.read()
-                print(type(mask_str))
-                print(mask_str)
-                mask_list = eval(mask_str)
-                f.close()
-        else:
-            print('noun_listを空にする', flush=True)
-            noun_list = []
-        
+        noun_list = np.genfromtxt(object_txt, dtype='str')
+        mask_list = np.loadtxt(mask_txt) # TODO: mask_listを使って使って画像加工を行う
         object_list = []
-        for noun in noun_list:
-            object_list.append(vocab(noun))
+        if noun_list.size == 1:
+            object_list = vocab(str(noun_list))
+        else:
+            for i in range(noun_list.size):
+                object_list.append(vocab(noun_list[i]))
 
         tokens = nltk.tokenize.word_tokenize(str(caption).lower())
         caption = []

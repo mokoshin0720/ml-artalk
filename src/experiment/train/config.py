@@ -4,13 +4,13 @@ import pickle
 from experiment.utils.vocab import Vocabulary
 
 def get_conf():
-    device = 'cuda:0'
-    # device = 'cuda:1'
+    # device = 'cuda:0'
+    device = 'cuda:1'
     # device = 'cuda:2'
     # device = 'cuda:3'
     
-    train_csv = 'data/artemis_train_dataset.csv'
-    test_csv = 'data/artemis_test_dataset.csv'
+    train_csv = 'data/train.csv'
+    test_csv = 'data/origin_test.csv'
     train_object_txt_dir = 'data/image_info/train/object'
     test_object_txt_dir = 'data/image_info/test/object'
     train_mask_txt_dir = 'data/image_info/train/mask'
@@ -74,7 +74,7 @@ def get_conf():
         # train
         'crop_size': 224,
         'num_layers': 1,
-        'num_epochs': 30,
+        'num_epochs': 1, # 30?
         'batch_size': 128,
         'num_workers': 0,
         'fine_tune_encoder': False,

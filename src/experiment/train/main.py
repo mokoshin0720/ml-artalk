@@ -15,11 +15,11 @@ import datetime
 import logging
 
 def train(conf):
-    wandb.init(
-        project="artalk",
-        config=conf,
-        name=conf['model_name']+str(datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9)))),
-    )
+    # wandb.init(
+    #     project="artalk",
+    #     config=conf,
+    #     name=conf['model_name']+str(datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9)))),
+    # )
     
     train_dataset = get_dataset(conf, is_train=True)
     test_dataset = get_dataset(conf, is_train=False)
@@ -30,7 +30,7 @@ def train(conf):
     
     if not os.path.exists(conf['model_path']):
         os.makedirs(conf['model_path'])
-        os.chmod(conf['model_path'],0777)
+        os.chmod(conf['model_path'],0o777)
 
     criterion = nn.CrossEntropyLoss()
 
@@ -52,10 +52,11 @@ def train(conf):
         decoder_optimizer,
         gamma=0.95
     )
-
-    for epoch in range(1, conf['num_epochs']):
-        wandb.log({'epoch': epoch})
+    
+    for epoch in range(0, conf['num_epochs']):
+        # wandb.log({'epoch': epoch})
         logging.info('train loop...')
+        print('train loop...', flush=True)
         model_loop(
             model_name=conf['model_name'],
             encoder=encoder,
@@ -87,13 +88,14 @@ def train(conf):
         decoder_scheduler.step()
 
 if __name__ == '__main__':
-    log_filename = init_logger()
-    try:
-        conf = get_conf()
-        train(conf)
-    except Exception as e:
-        traceback.print_exc()
-        notify_fail(str(e))
-    else:
-        notify_success(log_filename)
+    # log_filename = init_logger()
+    # try:
+    #     conf = get_conf()
+    #     train(conf)
+    # except Exception as e:
+    #     traceback.print_exc()
+    #     notify_fail(str(e))
+    # else:
+    #     notify_success(log_filename)
 
+    train(get_conf())

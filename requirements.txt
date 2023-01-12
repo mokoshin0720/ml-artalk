@@ -44,4 +44,6 @@ ftfy
 lvis
 tensorboard
 
+wandb
+
 git+https://github.com/cocodataset/panopticapi.git

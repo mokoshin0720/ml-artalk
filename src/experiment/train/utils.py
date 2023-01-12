@@ -2,6 +2,7 @@ import torch
 import experiment.models.cnn_lstm.normal as normal_cnn_lstm
 import experiment.models.cnn_lstm.with_word_object as object_cnn_lstm
 import experiment.models.show_attend_tell.normal as normal_sat
+import experiment.models.show_attend_tell.normal as normal_sat
 import logging
 import os
 import numpy as np

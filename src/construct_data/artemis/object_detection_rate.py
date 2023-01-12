@@ -105,7 +105,6 @@ def launch(train_or_test):
         for id in sentence_ids:
             for obj in idx2object_df.query('sentence_id == {}'.format(id))['object'].tolist():
                 object_dict[obj] = id
-                
         try:
             panoptic_masks, panoptic_labels = get_panoptic_info(
                 input_image=image_filename
