@@ -5,9 +5,9 @@ from experiment.utils.vocab import Vocabulary
 
 def get_conf():
     # device = 'cuda:0'
-    device = 'cuda:1'
+    # device = 'cuda:1'
     # device = 'cuda:2'
-    # device = 'cuda:3'
+    device = 'cuda:3'
     
     train_csv = 'data/train.csv'
     test_csv = 'data/origin_test.csv'
@@ -30,21 +30,23 @@ def get_conf():
         show_attend_tell_with_object,
     ]
     
+    # use_model = show_attend_tell
     use_model = show_attend_tell_with_object
+    image_dir = 'data/resized'
 
     with open('data/vocab.pkl', 'rb') as f:
         vocab = pickle.load(f)
-        
+
     return {
         # models
         'model_name': use_model,
         'normal_models': normal_models,
         'word_object_models': word_object_models,
-        
+
         # dataset
         'device': device,
         'model_path': 'models/' + use_model + '/',
-        'image_dir': 'data/resized',
+        'image_dir': image_dir,
         'vocab': vocab,
         'train_df': pd.read_csv(train_csv),
         'test_df': pd.read_csv(test_csv),
@@ -74,9 +76,9 @@ def get_conf():
         # train
         'crop_size': 224,
         'num_layers': 1,
-        'num_epochs': 1, # 30?
+        'num_epochs': 30, # 30?
         'batch_size': 128,
-        'num_workers': 0,
+        'num_workers': 1,
         'fine_tune_encoder': False,
         'encoder_lr': 1e-4,
         'decoder_lr': 1e-4,

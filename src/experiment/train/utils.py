@@ -2,7 +2,7 @@ import torch
 import experiment.models.cnn_lstm.normal as normal_cnn_lstm
 import experiment.models.cnn_lstm.with_word_object as object_cnn_lstm
 import experiment.models.show_attend_tell.normal as normal_sat
-import experiment.models.show_attend_tell.normal as normal_sat
+import experiment.models.show_attend_tell.with_word_object as object_sat
 import logging
 import os
 import numpy as np
@@ -23,6 +23,9 @@ def get_model(conf):
     elif conf['model_name'] == 'show_attend_tell':
         encoder = normal_sat.Encoder().to(conf['device'])
         decoder = normal_sat.DecoderWithAttention(conf['attention_dim'], conf['embed_dim'], conf['decoder_dim'], len(conf['vocab']), conf['encoder_dim'], conf['dropout']).to(conf['device'])
+    elif conf['model_name'] == 'show_attend_tell_with_object':
+        encoder = object_sat.Encoder().to(conf['device'])
+        decoder = object_sat.DecoderWithAttention(conf['attention_dim'], conf['embed_dim'], conf['decoder_dim'], len(conf['vocab']), conf['encoder_dim'], conf['dropout']).to(conf['device'])
     else:
         assert 'Invalid model name from get_model'
         

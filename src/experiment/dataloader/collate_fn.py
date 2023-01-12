@@ -39,4 +39,4 @@ def collate_with_object(data):
         end = object_nums[i]
         input_objects[i, :end] = torch.tensor(obj[:end])
 
-    return filenames, images, input_objects, targets, caption_lengths
+    return filenames, images, input_objects, targets, torch.FloatTensor(caption_lengths)

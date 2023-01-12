@@ -6,7 +6,7 @@ import torch
 from experiment.utils.vocab import Vocabulary
 import pandas as pd
 import numpy as np
-from pprint import pprint
+import cv2
 
 class WikiartDataset(data.Dataset):
     def __init__(self, root_dir, wikiart_df, vocab, transform=None):
@@ -52,7 +52,6 @@ class WikiartDatasetWithObject(data.Dataset):
         vocab = self.vocab
         wikiart_df = self.wikiart_df
         
-        # TODO: ☟indexじゃなくて、idである必要がある
         id = wikiart_df.at[index, 'id']
         object_txt = self.object_dir + '/' + str(id) + '.txt'
         mask_txt = self.mask_dir + '/' + str(id) + '.txt'
@@ -65,10 +64,13 @@ class WikiartDatasetWithObject(data.Dataset):
             image = self.transform(image)
             
         noun_list = np.genfromtxt(object_txt, dtype='str')
-        mask_list = np.loadtxt(mask_txt) # TODO: mask_listを使って使って画像加工を行う
+        mask_list = np.loadtxt(mask_txt)
+        
+        trans_img = generate_masked_img(np.array(image), mask_list)
+        
         object_list = []
         if noun_list.size == 1:
-            object_list = vocab(str(noun_list))
+            object_list = [vocab(str(noun_list))]
         else:
             for i in range(noun_list.size):
                 object_list.append(vocab(noun_list[i]))
@@ -96,3 +98,25 @@ def calc_disjunction(target_list):
         for target in target_list[1:]:
             result = np.logical_or(result, eval(target))
         return result
+    
+def generate_masked_img(original_img, mask_pos):
+    mask_pos = np.logical_not(mask_pos)
+    
+    blur_img = cv2.blur(original_img, ksize=(10, 10))
+    img_height, img_width, _ = original_img.shape
+
+    mask_i = Image.fromarray(np.uint8(mask_pos))
+    mask_array = np.asarray(mask_i.resize((img_width, img_height)))
+
+    indices = np.where(mask_array)
+
+    for i in range(len(indices[0])):
+        w = indices[0][i]
+        h = indices[1][i]
+
+        try:
+            original_img[w][h] = blur_img[w][h]
+        except Exception as e:
+            continue
+
+    return original_img
